@@ -1,0 +1,102 @@
+{
+    "DefaultRule" : "ActionTypePass",
+    "OnErrorRule" : "ActionTypeNone",
+    "IPv4BlockResolve" : "0.0.0.0",
+    "IPv6BlockResolve" : "0:0:0:0:0:0:0:0",
+    "Logfile":"-",
+    "ListenAddress":":53",
+    "NameServers": [
+        {
+            "IP": "8.8.8.8:53"
+        },
+        {
+            "IP": "8.8.8.8:53"
+        }
+    ],
+
+    "Router": {
+        "Host":"192.168.1.1",
+        "Port":"80",
+        "User":"admin",
+        "Password":"neger6slakt",
+        "Engine":"RouterTypeNetGear",
+        "PollChanges":true
+    },
+
+    "Hosts": [
+        {
+            "Name": "FREDRIKS-MBP",
+            "Rules": [
+                {
+                    "Type": "ActionTypePass"
+                }
+            ]
+        },
+        {
+            "Name": "NAGINI",
+            "Rules": [
+                {
+                    "Type": "ActionTypePass"
+                }
+            ]
+        }
+    ],
+    "Domains": [
+        {
+            "Name": "*.rules.test",
+            "Hosts": [
+                {
+                    "Name": "192.168.1.9",
+                    "Rules": [
+                        {
+                            "Type": "ActionTypeBlockedTimeSpan",
+                            "TimeSpan": "17:00-19:00"
+                        },
+                        {
+                        	"Type": "ActionTypePass"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "Name": "*.aftonbladet.se.",
+            "Hosts": [
+                {
+                    "Name": "127.0.0.1",
+                    "Rules": [
+                        {
+                            "Type": "ActionTypeBlockedSiteBan"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "Name": "*.gp.se.",
+            "Hosts": [
+                {
+                    "Name": "127.0.0.1",
+                    "Rules": [
+                        {
+                            "Type": "ActionTypeBlockedSiteBan"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "Name": "*.youtube.com.",
+            "Hosts": [
+                {
+                    "Name": "ERIKS-NETBOOK",
+                    "Rules": [
+                        {
+                            "Type": "ActionTypeBlockedSiteBan"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
