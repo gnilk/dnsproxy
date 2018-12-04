@@ -7,10 +7,10 @@
     "ListenAddress":":53",
     "NameServers": [
         {
-            "IP": "8.8.8.8:53"
+            "IP": "208.67.222.222:53"
         },
         {
-            "IP": "8.8.8.8:53"
+            "IP": "208.67.220.220:53"
         }
     ],
 
@@ -24,6 +24,18 @@
     },
 
     "Hosts": [
+        {
+            "Name": "192.168.1.17",
+            "Rules": [
+                {
+                    "Type": "ActionTypeBlockedTimeSpan",
+                    "TimeSpan": "10:00-14:00"
+                }, 
+                {
+                    "Type": "ActionTypePass"
+                }
+            ]
+        },
         {
             "Name": "FREDRIKS-MBP",
             "Rules": [

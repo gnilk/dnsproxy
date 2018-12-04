@@ -29,6 +29,12 @@ func (client *NetGearRouterClient) GetAttachedDeviceList() ([]RouterDevice, erro
 func (client *NetGearRouterClient) transformDevices(devices []netgear.AttachedDevice) ([]RouterDevice, error) {
 	rdlist := make([]RouterDevice, 0)
 	for _, d := range devices {
+
+		// Replace unknown's with 'Mac' addresses
+		if d.Name == "<unknown>" {
+			d.Name = d.MAC.String()
+		}
+
 		rd := RouterDevice{
 			IP:       d.IP,
 			Name:     d.Name,

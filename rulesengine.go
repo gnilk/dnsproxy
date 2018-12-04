@@ -19,7 +19,7 @@ type RulesEngine struct {
 func NewRulesEngine(conf *Config) (*RulesEngine, error) {
 	re := RulesEngine{
 		conf:        conf,
-		debug:       false,
+		debug:       true,
 		deviceCache: nil,
 	}
 	return &re, nil
@@ -36,6 +36,7 @@ func (r *RulesEngine) SetDeviceCache(dc *DeviceCache) {
 // Debugging set to true to enable debug logging specifically from this component
 //
 func (r *RulesEngine) Debugging(enable bool) {
+	log.Printf("[INFO] RulesEngine Debugging: %v", enable)
 	r.debug = enable
 }
 
@@ -46,6 +47,10 @@ func (r *RulesEngine) Debugging(enable bool) {
 //
 func (r *RulesEngine) Evaluate(domain, host string) (ActionType, error) {
 	action := r.conf.DefaultRule
+
+	if r.debug {
+		log.Printf("Evaluate, domain: %s, host: %s", domain, host)
+	}
 
 	// First check 'host' portion of the config - this is generally used for white/black-listing
 	// of specific hosts but can also be used for generic rules like disabling DNS within a certain
@@ -100,7 +105,14 @@ func (r *RulesEngine) DomainMatch(domain, pattern string) bool {
 }
 
 func (r *RulesEngine) HostMatch(host, pattern string) bool {
-	// Use device cache if here
+
+	// host is IP and pattern comes from config
+	// check if they are equal - we have a match
+	if host == pattern {
+		return true
+	}
+
+	// Now match against device cache
 	if r.deviceCache != nil {
 		// Translate host IP to device name
 		name, err := r.deviceCache.IPToName(host)

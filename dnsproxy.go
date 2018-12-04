@@ -80,6 +80,9 @@ func main() {
 			os.Exit(1)
 		case syscall.SIGHUP:
 			log.Println("sighup, reloading configuration")
+			if sys.ReloadConfig() != nil {
+				log.Printf("[ERROR] Failed to reload configuration")
+			}
 		}
 	}
 }
@@ -219,6 +222,7 @@ func dnsHandler(w dns.ResponseWriter, m *dns.Msg, proto string) {
 
 	// Log this request
 	duration := time.Since(tStart)
+	// Time of action is written automatically by the perf logger
 	perfItem := LogItem{
 		HostToResolve: domain,
 		RequestedBy:   clientAddr,

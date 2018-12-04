@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"sync"
 )
 
 type System struct {
@@ -14,6 +15,7 @@ type System struct {
 	rulesEngine    *RulesEngine
 	routerClient   RouterClient
 	deviceCache    *DeviceCache
+	mutex          sync.Mutex
 }
 
 //
@@ -27,7 +29,7 @@ func NewSystem(cfgFileName string) *System {
 		log.Panic(err)
 	}
 	sys.config = cfg
-	err = sys.validateConfig()
+	err = sys.validateConfig(cfg)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -61,6 +63,10 @@ func NewSystem(cfgFileName string) *System {
 				log.Printf("[INFO] Ok, device list downloaded")
 				sys.deviceCache = dc
 				dc.Dump()
+				if sys.Config().Router.PollChanges {
+					log.Printf("[INFO] Starting router auto refresh, interval: %d sec", sys.Config().Router.PollInterval)
+					dc.StartAutoRefresh(sys.Config().Router.PollInterval)
+				}
 			}
 		}
 	}
@@ -72,10 +78,60 @@ func NewSystem(cfgFileName string) *System {
 	return &sys
 }
 
+func (sys *System) ReloadConfig() error {
+
+	cfg, err := sys.loadConfig("config.json")
+	if err != nil {
+		log.Printf("[Error] Unable to PARSE configuration\n")
+		return err
+	}
+
+	// Take full mutex!!
+	sys.mutex.Lock()
+	defer sys.mutex.Unlock()
+
+	err = sys.validateConfig(cfg)
+	if err != nil {
+		log.Printf("[Error] Invalid configuration\n")
+		return err
+	}
+
+	re, err := NewRulesEngine(cfg)
+	if err != nil {
+		log.Printf("[ERROR] failed create rules engine: ", err.Error())
+		return err
+	}
+
+	// Create new log file if it changed, otherwise keep old
+	if cfg.Logfile != sys.config.Logfile {
+		err = sys.performanceLog.Close()
+		if err != nil {
+			log.Printf("[ERROR] Unable to close old log file: ", err.Error())
+			return err
+		}
+
+		logger, err := NewLogFileClient(cfg.Logfile)
+		if err != nil {
+			log.Panic(err.Error())
+		}
+		// Set it..
+		sys.performanceLog = logger
+
+	}
+
+	re.SetDeviceCache(sys.deviceCache)
+	sys.rulesEngine = re
+	sys.config = cfg
+
+	return nil
+}
+
 //
 // Config return internal config object
 //
 func (sys *System) Config() *Config {
+	sys.mutex.Lock()
+	defer sys.mutex.Unlock()
 	return sys.config
 }
 
@@ -83,6 +139,8 @@ func (sys *System) Config() *Config {
 // RulesEngine return internal RulesEngine object
 //
 func (sys *System) RulesEngine() *RulesEngine {
+	sys.mutex.Lock()
+	defer sys.mutex.Unlock()
 	return sys.rulesEngine
 }
 
@@ -90,6 +148,8 @@ func (sys *System) RulesEngine() *RulesEngine {
 // RouterClient returns the internal/global RouterClient object
 //
 func (sys *System) RouterClient() RouterClient {
+	sys.mutex.Lock()
+	defer sys.mutex.Unlock()
 	return sys.routerClient
 }
 
@@ -97,10 +157,14 @@ func (sys *System) RouterClient() RouterClient {
 // DeviceCache returns the internal/global DeviceCache object
 //
 func (sys *System) DeviceCache() *DeviceCache {
+	sys.mutex.Lock()
+	defer sys.mutex.Unlock()
 	return sys.deviceCache
 }
 
 func (sys *System) PerfLog() LogClient {
+	sys.mutex.Lock()
+	defer sys.mutex.Unlock()
 	return sys.performanceLog
 }
 
@@ -123,25 +187,25 @@ func (sys *System) initializeRouter(router Router) error {
 	return nil
 }
 
-func (sys *System) validateConfig() error {
+func (sys *System) validateConfig(config *Config) error {
 	// No listening address - set a default
-	if sys.config.ListenAddress == "" {
-		sys.config.ListenAddress = ":53"
+	if config.ListenAddress == "" {
+		config.ListenAddress = ":53"
 	}
 
 	// No forwarding name server - set a default (should perhaps resolve system ns here)
-	if len(sys.config.NameServers) == 0 {
+	if len(config.NameServers) == 0 {
 		nsdefault := NameServer{
 			IP: "8.8.8.8:53",
 		}
-		sys.config.NameServers = append(sys.config.NameServers, nsdefault)
+		config.NameServers = append(config.NameServers, nsdefault)
 	}
 
-	if sys.config.Router.PollChanges == true {
-		interval := sys.config.Router.PollInterval
+	if config.Router.PollChanges == true {
+		interval := config.Router.PollInterval
 		if interval < 10 {
 			log.Printf("[WARN] Router poll interval too low (%d) resetting to min (10 sec)\n", interval)
-			sys.config.Router.PollInterval = 10
+			config.Router.PollInterval = 10
 		}
 	}
 	return nil
