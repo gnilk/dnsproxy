@@ -8,7 +8,7 @@
         "Host":"192.168.1.1",
         "Port":"80",
         "User":"admin",
-        "Password":"neger6slakt",
+        "Password":"password",
         "Engine":"RouterTypeNetGear",
         "PollChanges":true,
         "PollIntervalSec":30
