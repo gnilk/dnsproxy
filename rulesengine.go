@@ -19,7 +19,7 @@ type RulesEngine struct {
 func NewRulesEngine(conf *Config) (*RulesEngine, error) {
 	re := RulesEngine{
 		conf:        conf,
-		debug:       true,
+		debug:       false,
 		deviceCache: nil,
 	}
 	return &re, nil
