@@ -1,8 +1,18 @@
 {
     "DefaultRule" : "ActionTypePass",
     "OnErrorRule" : "ActionTypeNone",
+    "IPv4BlockResolve" : "0.0.0.0",
+    "IPv6BlockResolve" : "0:0:0:0:0:0:0:0",
     "Logfile":"-",
-    "ListenAddress":":2053",
+    "ListenAddress":":53",
+    "NameServers": [
+        {
+            "IP": "208.67.222.222:53"
+        },
+        {
+            "IP": "208.67.220.220:53"
+        }
+    ],
 
     "Router": {
         "Host":"192.168.1.1",
@@ -10,20 +20,24 @@
         "User":"admin",
         "Password":"your-router-password-here",
         "Engine":"RouterTypeNetGear",
-        "PollChanges":true,
-        "PollIntervalSec":30
+        "PollChanges":true
     },
-    "NameServers": [
-        {
-            "IP": "8.8.8.8:53"
-        },
-        {
-            "IP": "8.8.8.8:53"
-        }
-    ],
+
     "Hosts": [
         {
-            "Name": "127.0.0.1",
+            "Name": "192.168.1.17",
+            "Rules": [
+                {
+                    "Type": "ActionTypeBlockedTimeSpan",
+                    "TimeSpan": "10:00-14:00"
+                }, 
+                {
+                    "Type": "ActionTypePass"
+                }
+            ]
+        },
+        {
+            "Name": "FREDRIKS-MBP",
             "Rules": [
                 {
                     "Type": "ActionTypePass"
@@ -34,19 +48,7 @@
             "Name": "NAGINI",
             "Rules": [
                 {
-                    "Type": "ActionTypeBlockedTimeSpan",
-                    "TimeSpan": "16:00-20:00"
-                },
-                {
                     "Type": "ActionTypePass"
-                }
-            ]
-        },
-        {
-            "Name": "FREDRIKS-MBP",
-            "Rules": [
-                {
-                    "Type": "ActionTypeBlockedDevice"
                 }
             ]
         }
@@ -56,33 +58,50 @@
             "Name": "*.rules.test",
             "Hosts": [
                 {
-                    "Name": "127.0.0.2",
+                    "Name": "192.168.1.9",
                     "Rules": [
                         {
                             "Type": "ActionTypeBlockedTimeSpan",
                             "TimeSpan": "17:00-19:00"
                         },
                         {
-                        	"Type": "ActionTypeNone"
-                        }
-                    ]
-                },
-                {
-                    "Name": "127.0.0.3",
-                    "Rules": [
-                        {
-                            "Type": "ActionTypeBlockedDevice"
+                        	"Type": "ActionTypePass"
                         }
                     ]
                 }
-
             ]
         },
         {
-            "Name": "*",
+            "Name": "*.aftonbladet.se.",
             "Hosts": [
                 {
-                    "Name": "*",
+                    "Name": "127.0.0.2",
+                    "Rules": [
+                        {
+                            "Type": "ActionTypeBlockedSiteBan"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "Name": "*.gp.se.",
+            "Hosts": [
+                {
+                    "Name": "127.0.0.1",
+                    "Rules": [
+                        {
+                            "Type": "ActionTypeBlockedSiteBan"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "Name": "*.youtube.com.",
+            "Hosts": [
+                {
+                    "Name": "ERIKS-NETBOOK",
                     "Rules": [
                         {
                             "Type": "ActionTypeBlockedSiteBan"

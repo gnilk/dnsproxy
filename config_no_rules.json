@@ -1,0 +1,30 @@
+{
+    "DefaultRule" : "ActionTypePass",
+    "OnErrorRule" : "ActionTypeNone",
+    "IPv4BlockResolve" : "0.0.0.0",
+    "IPv6BlockResolve" : "0:0:0:0:0:0:0:0",
+    "Logfile":"-",
+    "ListenAddress":":53",
+    "NameServers": [
+        {
+            "IP": "208.67.222.222:53"
+        },
+        {
+            "IP": "208.67.220.220:53"
+        }
+    ],
+
+    "Router": {
+        "Host":"192.168.1.1",
+        "Port":"80",
+        "User":"admin",
+        "Password":"your-router-password-here",
+        "Engine":"RouterTypeNetGear",
+        "PollChanges":true
+    },
+    "Hosts": [
+    ],
+    "Domains": [
+    ]
+
+}
