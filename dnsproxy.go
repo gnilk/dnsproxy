@@ -15,6 +15,7 @@ package main
 	3) Block a device or domain within specific time ranges
 
 	TODO:
+	- Add default rule to 'Domain' configuration
 	- Fetch DNS settings from router (doesn't require you to key them in)
 	- Alias for IP names when Router manufacture is not supported
 	- Implement a better way to instansiate router clients and implement more router clients...
