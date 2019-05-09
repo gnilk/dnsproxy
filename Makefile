@@ -1,5 +1,6 @@
 BIN = $(GOPATH)/bin
 MODELGEN = $(BIN)/modelgenerator
+GOIMPORTS = $(BIN)/goimports
 
 NODE_BIN = $(shell npm bin)
 
@@ -35,4 +36,5 @@ test: $(SRC_FILES) $(TEST_FILES)
 
 persistence: config_datamodel.xml
 	$(MODELGEN) -v -c config_datamodel.xml -o config.go
+	$(GOIMPORTS) -w $(MODEL_OUT)
 
