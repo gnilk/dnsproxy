@@ -32,5 +32,8 @@ func TestRouterGetAttachedDevices(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	log.Println(devices)
+	for _, d := range devices {
+		log.Printf("%s\t%s\t(%s)\n", d.MAC.String(), d.IP.String(), d.Name)
+	}
+	//	log.Println(devices)
 }
