@@ -221,12 +221,17 @@ func dnsHandler(w dns.ResponseWriter, m *dns.Msg, proto string) {
 		doDnsExchange(w, m, proto)
 	}
 
+	clientName, err := sys.DeviceCache().IPToName(clientAddr)
+	if err != nil {
+		clientName = clientAddr
+	}
+
 	// Log this request
 	duration := time.Since(tStart)
 	// Time of action is written automatically by the perf logger
 	perfItem := LogItem{
 		HostToResolve: domain,
-		RequestedBy:   clientAddr,
+		RequestedBy:   clientName, //	[gnilk,2019-05-09]	RequestedBy:   clientAddr,
 		Action:        action.String(),
 		Duration:      duration.Seconds(),
 	}
