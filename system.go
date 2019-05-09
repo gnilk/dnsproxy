@@ -36,7 +36,7 @@ func NewSystem(cfgFileName string) *System {
 
 	re, err := NewRulesEngine(sys.config)
 	if err != nil {
-		log.Printf("[ERROR] failed create rules engine: ", err.Error())
+		log.Println("[ERROR] failed create rules engine: ", err.Error())
 		os.Exit(1)
 	}
 
@@ -98,7 +98,7 @@ func (sys *System) ReloadConfig() error {
 
 	re, err := NewRulesEngine(cfg)
 	if err != nil {
-		log.Printf("[ERROR] failed create rules engine: ", err.Error())
+		log.Println("[ERROR] failed create rules engine: ", err.Error())
 		return err
 	}
 
@@ -106,7 +106,7 @@ func (sys *System) ReloadConfig() error {
 	if cfg.Logfile != sys.config.Logfile {
 		err = sys.performanceLog.Close()
 		if err != nil {
-			log.Printf("[ERROR] Unable to close old log file: ", err.Error())
+			log.Println("[ERROR] Unable to close old log file: ", err.Error())
 			return err
 		}
 
@@ -172,12 +172,18 @@ func (sys *System) PerfLog() LogClient {
 // Support functions to get all subsystems up and running
 //
 func (sys *System) initializeRouter(router Router) error {
-
-	if router.Engine != RouterTypeNetGear {
+	var routerClient RouterClient
+	switch router.Engine {
+	case RouterTypeNetGear:
+		routerClient = NewNetGearRouterClient()
+		break
+	case RouterTypeUnifi:
+		routerClient = NewUnifiRouterClient()
+		break
+	default:
 		return fmt.Errorf("Unknown router type '%s', check configuration", router.Engine.String())
 	}
 
-	routerClient := NewNetGearRouterClient()
 	err := routerClient.Login(router.Host, router.Port, router.User, router.Password)
 	if err != nil {
 		return err

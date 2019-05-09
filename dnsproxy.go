@@ -58,14 +58,14 @@ func main() {
 		srv := &dns.Server{Addr: sys.Config().ListenAddress, Net: "udp", Handler: dns.HandlerFunc(dnsUdpHandler)}
 		err := srv.ListenAndServe()
 		if err != nil {
-			log.Fatal("[ERROR] Failed to set udp listener %s\n", err.Error())
+			log.Fatal("[ERROR] Failed to set udp listener\n", err.Error())
 		}
 	}()
 	go func() {
 		srv := &dns.Server{Addr: sys.Config().ListenAddress, Net: "tcp", Handler: dns.HandlerFunc(dnsTcpHandler)}
 		err := srv.ListenAndServe()
 		if err != nil {
-			log.Fatal("[ERROR] Failed to set tcp listener %s\n", err.Error())
+			log.Fatal("[ERROR] Failed to set tcp listener\n", err.Error())
 		}
 	}()
 	sig := make(chan os.Signal)

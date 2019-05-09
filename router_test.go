@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"testing"
 )
 
@@ -10,13 +11,13 @@ func getRouter() RouterClient {
 	if glbRouter != nil {
 		return glbRouter
 	}
-	glbRouter = NewNetGearRouterClient()
+	glbRouter = NewUnifiRouterClient()
 	return glbRouter
 }
 
 func TestRouterLogin(t *testing.T) {
 	router := getRouter()
-	err := router.Login("192.168.1.1", "80", "admin", "neger6slakt")
+	err := router.Login("192.168.1.46", "8443", "Fredrik", "neger6slakt")
 	if err != nil {
 		t.Error(err)
 	}
@@ -27,8 +28,9 @@ func TestRouterGetAttachedDevices(t *testing.T) {
 	if router == nil {
 		t.Error("No router")
 	}
-	_, err := router.GetAttachedDeviceList()
+	devices, err := router.GetAttachedDeviceList()
 	if err != nil {
 		t.Error(err)
 	}
+	log.Println(devices)
 }

@@ -5,11 +5,11 @@
     "ListenAddress":":2053",
 
     "Router": {
-        "Host":"192.168.1.1",
-        "Port":"80",
-        "User":"admin",
-        "Password":"your-router-password-here",
-        "Engine":"RouterTypeNetGear",
+        "Host":"192.168.1.46",
+        "Port":"8443",
+        "User":"Fredrik",
+        "Password":"neger6slakt",
+        "Engine":"RouterTypeUnifi",
         "PollChanges":true,
         "PollIntervalSec":30
     },
@@ -31,7 +31,7 @@
             ]
         },
         {
-            "Name": "NAGINI",
+            "Name": "nagini",
             "Rules": [
                 {
                     "Type": "ActionTypeBlockedTimeSpan",

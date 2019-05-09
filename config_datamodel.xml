@@ -12,6 +12,7 @@
     <define type="enum" name="RouterType">
         <int name="RouterTypeNone" value="0"/>
         <int name="RouterTypeNetGear" value="1"/>
+        <int name="RouterTypeUnifi" value="2"/>
     </define>    
 
     <define type="class" name="Config">

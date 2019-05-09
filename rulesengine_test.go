@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 	"testing"
 	"time"
 )
@@ -122,13 +123,13 @@ func TestNameRuleBlock(t *testing.T) {
 
 // Note: This requires router initialization
 func TestNameToIP(t *testing.T) {
-	addr, err := testsys.DeviceCache().NameToIP("NAGINI")
+	addr, err := testsys.DeviceCache().NameToIP("nagini")
 	if err != nil {
 		t.Error(err)
 	}
 
 	if addr.String() != "192.168.1.8" {
-		t.Error(fmt.Errorf("Expected '192.168.1.8' for 'NAGINI' - got: %s\n", addr.String()))
+		t.Error(fmt.Errorf("Expected '192.168.1.8' for 'nagini' - got: %s\n", addr.String()))
 	}
 }
 
@@ -139,8 +140,8 @@ func TestIPToName(t *testing.T) {
 		t.Error(err)
 	}
 
-	if name != "NAGINI" {
-		t.Error(fmt.Errorf("Expected 'Nagini' for 192.168.1.8' - got: %s\n", name))
+	if strings.ToLower(name) != "nagini" {
+		t.Error(fmt.Errorf("Expected 'nagini' for 192.168.1.8' - got: %s\n", name))
 	}
 }
 
