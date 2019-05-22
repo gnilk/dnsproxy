@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"net"
 
 	unifi "github.com/dim13/unifi"
@@ -9,6 +10,7 @@ import (
 type UnifiRouterClient struct {
 	controller *unifi.Unifi
 	//router *netgear.Client
+	host, port, user, pass string
 }
 
 func NewUnifiRouterClient() RouterClient {
@@ -19,9 +21,26 @@ func NewUnifiRouterClient() RouterClient {
 func (client *UnifiRouterClient) Login(host, port, user, pass string) error {
 	var err error
 	client.controller, err = unifi.Login(user, pass, host, "8443", "dubious-machines.com", 5)
+	if err == nil {
+		// Save these, as we might need to re-login
+		client.host = host
+		client.port = port
+		client.user = user
+		client.pass = pass
+	}
 	return err
 }
+
 func (client *UnifiRouterClient) GetAttachedDeviceList() ([]RouterDevice, error) {
+
+	if unifi.Connected != unifi.Connected {
+		log.Printf("unifi router disconnected, re-login initated\n")
+		err := client.Login(client.host, client.port, client.user, client.pass)
+		if err != nil {
+			return nil, err
+		}
+		log.Printf("Logged in to Unifi router\n")
+	}
 
 	site, err := client.controller.Site("dubious-machines.com")
 	if err != nil {
