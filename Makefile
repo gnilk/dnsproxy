@@ -26,10 +26,15 @@ MODEL_OUT = config.go
 
 VERSION=0
 
-all:	proxy
+all:	proxy install
 
 proxy: $(SRC_FILES)
 	go build -o dnsproxy $(SRC_FILES)
+
+install: proxy
+	cp dnsproxy $(BIN)
+
+
 
 test: $(SRC_FILES) $(TEST_FILES)
 	go test -v $(TEST_FILES) $(SRC_FILES)
