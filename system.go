@@ -55,7 +55,7 @@ func NewSystem(cfgFileName string) *System {
 			log.Printf("[ERROR] Router initialization failed: %s\n", err.Error())
 			log.Printf("[WARN] Device Name lookup disabled - requires working router connection\n")
 		} else {
-			dc := NewDeviceCache(sys.routerClient)
+			dc := NewDeviceCache(sys.routerClient, sys.config.Router)
 			err = dc.Initialize()
 			if err != nil {
 				log.Printf("[ERROR] Device Cache initialization failed: %s\n", err.Error())

@@ -12,13 +12,14 @@ var ErrDeviceNameNotFound = errors.New("Device name not found")
 var ErrDeviceIPNotFound = errors.New("Device IP not found")
 
 type DeviceCache struct {
+	routerConfig Router
 	routerClient RouterClient
 	devFromName  map[string]RouterDevice
 	devFromIP    map[string]RouterDevice
 	lock         sync.Mutex
 }
 
-func NewDeviceCache(routerClient RouterClient) *DeviceCache {
+func NewDeviceCache(routerClient RouterClient, router Router) *DeviceCache {
 	dc := DeviceCache{
 		routerClient: routerClient,
 		devFromName:  make(map[string]RouterDevice),
@@ -32,12 +33,27 @@ func (dc *DeviceCache) Initialize() error {
 }
 
 func (dc *DeviceCache) Refresh() error {
+	err := dc.doRefresh()
+	if err != nil {
+		err = dc.reInitialize()
+		if err != nil {
+			log.Printf("[ERROR] DeviceCache::Refresh, Unable to reinitialize router, err: %s\n", err.Error())
+		}
+	}
+	return err
+}
+
+func (dc *DeviceCache) reInitialize() error {
+	return dc.routerClient.Login(dc.routerConfig.Host, dc.routerConfig.Port, dc.routerConfig.User, dc.routerConfig.Password)
+}
+
+func (dc *DeviceCache) doRefresh() error {
 	dc.lock.Lock()
 	defer dc.lock.Unlock()
 
 	devices, err := dc.routerClient.GetAttachedDeviceList()
 	if err != nil {
-		log.Printf("[ERROR] DeviceCache::Initialize, failed to retrieve list of attached devices: %s\n", err.Error())
+		log.Printf("[ERROR] DeviceCache::Refresh, failed to retrieve list of attached devices: %s\n", err.Error())
 		return err
 	}
 	// set to table
