@@ -17,7 +17,7 @@ func getRouter() RouterClient {
 
 func TestRouterLogin(t *testing.T) {
 	router := getRouter()
-	err := router.Login("192.168.1.46", "8443", "Fredrik", "neger6slakt")
+	err := router.Login("192.168.1.30", "8443", "Fredrik", "neger6slakt")
 	if err != nil {
 		t.Error(err)
 	}

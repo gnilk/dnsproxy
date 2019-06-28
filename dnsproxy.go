@@ -221,9 +221,10 @@ func dnsHandler(w dns.ResponseWriter, m *dns.Msg, proto string) {
 		doDnsExchange(w, m, proto)
 	}
 
-	clientName, err := sys.DeviceCache().IPToName(clientAddr)
-	if err != nil {
-		clientName = clientAddr
+	clientName := clientAddr
+	// The device cache can be nil - if no router is configured (I should fix that)
+	if sys.DeviceCache() != nil {
+		clientName, err = sys.DeviceCache().IPToName(clientAddr)
 	}
 
 	// Log this request
