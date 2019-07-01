@@ -45,10 +45,44 @@ import (
 //
 var sys *System
 
+func printHelp() {
+	fmt.Printf("dnsproxy v0.3, useage:\n")
+	fmt.Printf("dnsproxy [-t] [config file]\n")
+	fmt.Printf("-t, test configuration\n")
+	fmt.Printf("default config file is 'config.json'\n")
+}
 func main() {
+
+	testRules := false
+	cfgFile := "config.json"
+
+	if len(os.Args) > 1 {
+		for i := 1; i < len(os.Args); i++ {
+			arg := os.Args[i]
+			if arg[0] == '-' {
+				switch arg[1] {
+				case 't':
+					testRules = true
+					break
+				default:
+					printHelp()
+					os.Exit(1)
+					break
+				}
+			} else {
+				cfgFile = arg
+			}
+		}
+	}
+
+	if testRules {
+		doTestRules(cfgFile)
+		os.Exit(1)
+	}
+
 	// Suck in the system configuration
 	// NOTE: This will panic and fail if basics are wrong
-	sys = NewSystem("config.json")
+	sys = NewSystem(cfgFile)
 
 	// Start proxy
 	log.Printf("[INFO] Starting proxy at: %s\n", sys.Config().ListenAddress)
@@ -86,6 +120,17 @@ func main() {
 			}
 		}
 	}
+}
+
+func doTestRules(cfgFile string) {
+	log.Printf("Testing rules, reading: %s\n", cfgFile)
+	err := TestSystemConfig(cfgFile)
+	if err != nil {
+		log.Printf("Failed, error: %s\n", err.Error())
+		return
+	}
+	log.Printf("Config looks ok!\n")
+	return
 }
 
 //

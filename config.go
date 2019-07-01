@@ -268,6 +268,7 @@ type Router struct {
 	Engine       RouterType
 	PollChanges  bool
 	PollInterval int
+	TimeoutSec   int
 }
 
 func (this *Router) GetHost() string {
@@ -324,6 +325,14 @@ func (this *Router) GetPollInterval() int {
 
 func (this *Router) SetPollInterval(value int) {
 	this.PollInterval = value
+}
+
+func (this *Router) GetTimeoutSec() int {
+	return this.TimeoutSec
+}
+
+func (this *Router) SetTimeoutSec(value int) {
+	this.TimeoutSec = value
 }
 
 // ToJSON creates a JSON representation of the data for the type

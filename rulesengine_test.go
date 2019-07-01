@@ -57,6 +57,23 @@ func TestLocalHostPass(t *testing.T) {
 	}
 }
 
+func TestPassWithTimeSpan(t *testing.T) {
+	tm := time.Now()
+	r := Rule{
+		Type:     ActionTypePass,
+		TimeSpan: fmt.Sprintf("%d:00-%d:00", tm.Hour(), tm.Hour()+2),
+	}
+
+	action, err := r.EvaluateRule()
+	if err != nil {
+		t.Error(err)
+	}
+	if action != ActionTypePass {
+		t.Errorf("Wrong action, expected 'ActionTypePAss' got %s\n", action.String())
+	}
+
+}
+
 func TestLocalHostNone(t *testing.T) {
 	action, err := testsys.RulesEngine().Evaluate("site2.rules.test", "127.0.0.2")
 	if err != nil {

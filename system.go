@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"sync"
+	"time"
 )
 
 type System struct {
@@ -76,6 +77,43 @@ func NewSystem(cfgFileName string) *System {
 	sys.rulesEngine = re
 
 	return &sys
+}
+
+//
+// Tests the system configuration
+//
+func TestSystemConfig(cfgFileName string) error {
+
+	sys := System{}
+	cfg, err := sys.loadConfig(cfgFileName)
+	if err != nil {
+		log.Panic(err)
+		return err
+	}
+	sys.config = cfg
+	err = sys.validateConfig(cfg)
+	if err != nil {
+		log.Panic(err)
+		return err
+	}
+
+	_, err = NewRulesEngine(sys.config)
+	if err != nil {
+		log.Println("[ERROR] failed create rules engine: ", err.Error())
+		//os.Exit(1)
+		return err
+	}
+
+	if sys.config.Router.Engine != RouterTypeNone {
+		log.Printf("[INFO] Router configuration found - trying...")
+		err = sys.initializeRouter(sys.config.Router)
+		if err != nil {
+			log.Printf("[ERROR] Router initialization failed: %s\n", err.Error())
+			log.Printf("[WARN] Device Name lookup disabled - requires working router connection\n")
+			return err
+		}
+	}
+	return nil
 }
 
 func (sys *System) ReloadConfig() error {
@@ -184,11 +222,32 @@ func (sys *System) initializeRouter(router Router) error {
 		return fmt.Errorf("Unknown router type '%s', check configuration", router.Engine.String())
 	}
 
-	err := routerClient.Login(router.Host, router.Port, router.User, router.Password)
-	if err != nil {
-		return err
+	ch := make(chan error, 1)
+	go func() {
+		err := routerClient.Login(router.Host, router.Port, router.User, router.Password)
+		ch <- err
+	}()
+
+	tout := time.Duration(router.TimeoutSec) * time.Second
+	if tout < 5 {
+		log.Printf("[WARN] Router timeout not specified or too low, setting to 5 seconds\n")
+		tout = 5 * time.Second
 	}
-	sys.routerClient = routerClient
+
+	select {
+	case err := <-ch:
+		{
+			if err != nil {
+				return err
+			}
+			sys.routerClient = routerClient
+		}
+	case <-time.After(tout):
+		{
+			sys.routerClient = nil
+			return fmt.Errorf("Timeout while connecting to router at host '%s'", router.Host)
+		}
+	}
 
 	return nil
 }

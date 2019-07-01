@@ -5,7 +5,7 @@
     "ListenAddress":":2053",
 
     "Router": {
-        "Host":"192.168.1.46",
+        "Host":"192.168.1.30",
         "Port":"8443",
         "User":"Fredrik",
         "Password":"neger6slakt",
@@ -29,7 +29,7 @@
                     "Type": "ActionTypePass"
                 }
             ]
-        },
+	},
         {
             "Name": "nagini",
             "Rules": [

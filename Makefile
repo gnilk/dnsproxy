@@ -9,6 +9,9 @@ TEST_FILES = \
 	rulesengine_test.go \
 	router_test.go
 
+TEST_ROUTER_FILES = router_test.go
+TEST_RULES_FILES = rulesengine_test.go
+
 SRC_FILES = \
 	dnsproxy.go \
 	perflog.go \
@@ -38,6 +41,13 @@ install: proxy
 
 test: $(SRC_FILES) $(TEST_FILES)
 	go test -v $(TEST_FILES) $(SRC_FILES)
+
+test_router: $(SRC_FILES) $(TEST_ROUTER_FILES)
+	go test -v $(TEST_ROUTER_FILES) $(SRC_FILES)
+
+test_rules: $(SRC_FILES) $(TEST_RULES_FILES)
+	go test -v $(TEST_RULES_FILES) $(SRC_FILES)
+
 
 persistence: config_datamodel.xml
 	$(MODELGEN) -v -c config_datamodel.xml -o config.go

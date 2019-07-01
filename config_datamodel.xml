@@ -36,6 +36,7 @@
         <field type="RouterType" name="Engine" />
         <field type="bool" name="PollChanges" />
         <field type="int" name="PollInterval" />
+        <field type="int" name="TimeoutSec" default="10" />
     </define>
 
     <define type="class" name="NameServer">

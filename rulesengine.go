@@ -148,12 +148,19 @@ func (re *RulesEngine) EvaluateRules(rules []Rule) (ActionType, error) {
 }
 
 func (r *Rule) EvaluateRule() (ActionType, error) {
+
+	// All rules can have a timespan
+	if r.TimeSpan != "" {
+		return r.EvaluateTimeSpanBlock(r.TimeSpan)
+	}
+
 	switch r.Type {
 	case ActionTypeBlockedDevice:
 		return ActionTypeBlockedDevice, nil
 	case ActionTypeBlockedSiteBan:
 		return ActionTypeBlockedSiteBan, nil
 	case ActionTypeBlockedTimeSpan:
+		// Note: This should not happen!!!
 		return r.EvaluateTimeSpanBlock(r.TimeSpan)
 	case ActionTypePass:
 		return ActionTypePass, nil
@@ -184,7 +191,7 @@ func (r *Rule) EvaluateTimeSpanBlock(strTimeSpan string) (ActionType, error) {
 
 	tNow, _ := time.Parse("15:04", time.Now().Format("15:04"))
 
-	log.Printf("EvaluateTimeSpanBlock: Now: %s, Start: %s, End: %s\n", tNow.Format("15:04"), tStart.Format("15:04"), tEnd.Format("15:04"))
+	//log.Printf("EvaluateTimeSpanBlock: Now: %s, Start: %s, End: %s\n", tNow.Format("15:04"), tStart.Format("15:04"), tEnd.Format("15:04"))
 
 	if tNow.After(tStart) && tEnd.After(tNow) {
 		return r.Type, nil
