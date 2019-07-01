@@ -231,6 +231,8 @@ func (sys *System) initializeRouter(router Router) error {
 		log.Printf("  %s - %s\n", d.IP, d.Name)
 	}
 
+	sys.routerClient = routerClient
+
 	return nil
 }
 
