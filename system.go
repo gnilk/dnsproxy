@@ -7,7 +7,6 @@ import (
 	"log"
 	"os"
 	"sync"
-	"time"
 )
 
 type System struct {
@@ -216,37 +215,20 @@ func (sys *System) initializeRouter(router Router) error {
 		routerClient = NewNetGearRouterClient()
 		break
 	case RouterTypeUnifi:
-		routerClient = NewUnifiRouterClient()
+		routerClient = NewUnifiRouterClient(&router)
 		break
 	default:
 		return fmt.Errorf("Unknown router type '%s', check configuration", router.Engine.String())
 	}
 
-	ch := make(chan error, 1)
-	go func() {
-		err := routerClient.Login(router.Host, router.Port, router.User, router.Password)
-		ch <- err
-	}()
-
-	tout := time.Duration(router.TimeoutSec) * time.Second
-	if tout < 5 {
-		log.Printf("[WARN] Router timeout not specified or too low, setting to 5 seconds\n")
-		tout = 5 * time.Second
+	devices, err := routerClient.GetAttachedDeviceList()
+	if err != nil {
+		log.Printf("[ERR] Login failed\n")
+		return err
 	}
-
-	select {
-	case err := <-ch:
-		{
-			if err != nil {
-				return err
-			}
-			sys.routerClient = routerClient
-		}
-	case <-time.After(tout):
-		{
-			sys.routerClient = nil
-			return fmt.Errorf("Timeout while connecting to router at host '%s'", router.Host)
-		}
+	log.Printf("[OK] Router is working, devices:\n")
+	for _, d := range devices {
+		log.Printf("  %s - %s\n", d.IP, d.Name)
 	}
 
 	return nil
