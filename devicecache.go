@@ -58,6 +58,7 @@ func (dc *DeviceCache) doRefresh() error {
 	}
 	// set to table
 	for _, d := range devices {
+		// TODO: A device can have multiple IP's this will just go into a toggle!!!!
 		dev, ok := dc.devFromName[d.Name]
 		// Check for device changes and/or new devices
 		if ok {
