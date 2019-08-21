@@ -150,11 +150,13 @@ func (re *RulesEngine) EvaluateRules(rules []Rule) (ActionType, error) {
 func (r *Rule) EvaluateRule() (ActionType, error) {
 
 	// All rules can have a timespan
-	if r.TimeSpan != "" {
+	if (r.TimeSpan != "") && (r.Type != ActionTypePassAccumulatedTime) {
 		return r.EvaluateTimeSpanBlock(r.TimeSpan)
 	}
 
 	switch r.Type {
+	case ActionTypePassAccumulatedTime:
+		return r.EvaluateAccumulatedTime(r.MaxTime)
 	case ActionTypeBlockedDevice:
 		return ActionTypeBlockedDevice, nil
 	case ActionTypeBlockedSiteBan:
@@ -167,8 +169,23 @@ func (r *Rule) EvaluateRule() (ActionType, error) {
 	case ActionTypeNone:
 		return ActionTypeNone, nil
 	}
-	log.Printf("[Warninig] Rule::EvaluateRule, invalid rule type: %v\n", r)
+	log.Printf("[Warning] Rule::EvaluateRule, invalid rule type: %v\n", r)
 	return ActionTypeNone, nil
+}
+
+// EvaluateAccumulatedTime evaluates accumulated time for a device
+func (r *Rule) EvaluateAccumulatedTime(strMaxTime string) (ActionType, error) {
+	log.Printf("[Error] Rule::EvaluateAccumulatedTime, not implemented!\n")
+	_, err := time.Parse("15:04", strMaxTime)
+	if err != nil {
+		return ActionTypeNone, err
+	}
+
+	// 1) is host already above max, return default
+	// 2) (current - last) < 5min => Addera to accumulated time
+	// 3) Update accumulated time
+
+	return r.Type, err
 }
 
 // EvaluateTimeSpanBlock evaluates the current time with respect to definition

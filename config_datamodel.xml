@@ -7,6 +7,7 @@
         <int name="ActionTypeBlockedDevice" value="2"/>
         <int name="ActionTypeBlockedSiteBan" value="3"/>
         <int name="ActionTypeBlockedTimeSpan" value="4"/>
+        <int name="ActionTypePassAccumulatedTime" value="5"/>
     </define>    
 
     <define type="enum" name="RouterType">
@@ -56,6 +57,7 @@
     <define type="class" name="Rule">
         <field type="ActionType" name="Type" />
         <field type="string" name="TimeSpan" />
+        <field type="string" name="MaxTime" />>
     </define>
 
    

@@ -15,12 +15,13 @@ import (
 type ActionType int64
 
 const (
-	_                                    = iota
-	ActionTypeNone            ActionType = 0
-	ActionTypePass            ActionType = 1
-	ActionTypeBlockedDevice   ActionType = 2
-	ActionTypeBlockedSiteBan  ActionType = 3
-	ActionTypeBlockedTimeSpan ActionType = 4
+	_                                        = iota
+	ActionTypeNone                ActionType = 0
+	ActionTypePass                ActionType = 1
+	ActionTypeBlockedDevice       ActionType = 2
+	ActionTypeBlockedSiteBan      ActionType = 3
+	ActionTypeBlockedTimeSpan     ActionType = 4
+	ActionTypePassAccumulatedTime ActionType = 5
 )
 
 var mapActionTypeToName = map[ActionType]string{
@@ -29,14 +30,16 @@ var mapActionTypeToName = map[ActionType]string{
 	2: "ActionTypeBlockedDevice",
 	3: "ActionTypeBlockedSiteBan",
 	4: "ActionTypeBlockedTimeSpan",
+	5: "ActionTypePassAccumulatedTime",
 }
 
 var mapActionTypeToValue = map[string]ActionType{
-	"ActionTypeNone":            0,
-	"ActionTypePass":            1,
-	"ActionTypeBlockedDevice":   2,
-	"ActionTypeBlockedSiteBan":  3,
-	"ActionTypeBlockedTimeSpan": 4,
+	"ActionTypeNone":                0,
+	"ActionTypePass":                1,
+	"ActionTypeBlockedDevice":       2,
+	"ActionTypeBlockedSiteBan":      3,
+	"ActionTypeBlockedTimeSpan":     4,
+	"ActionTypePassAccumulatedTime": 5,
 }
 
 func (this *ActionType) String() string {
@@ -570,6 +573,7 @@ func HostFromXML(xmldata string) (*Host, error) {
 type Rule struct {
 	Type     ActionType
 	TimeSpan string
+	MaxTime  string
 }
 
 func (this *Rule) GetType() ActionType {
@@ -586,6 +590,14 @@ func (this *Rule) GetTimeSpan() string {
 
 func (this *Rule) SetTimeSpan(value string) {
 	this.TimeSpan = value
+}
+
+func (this *Rule) GetMaxTime() string {
+	return this.MaxTime
+}
+
+func (this *Rule) SetMaxTime(value string) {
+	this.MaxTime = value
 }
 
 // ToJSON creates a JSON representation of the data for the type

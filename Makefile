@@ -21,6 +21,7 @@ SRC_FILES = \
 	netgearrouter.go \
 	unifirouterclient.go \
 	devicecache.go \
+	httpapi.go \
 	system.go \
 	util.go
 

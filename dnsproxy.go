@@ -31,12 +31,14 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"net/http"
 	"os"
 	"os/signal"
 	"strings"
 	"syscall"
 	"time"
 
+	"github.com/gorilla/handlers"
 	"github.com/miekg/dns"
 )
 
@@ -102,6 +104,9 @@ func main() {
 			log.Fatal("[ERROR] Failed to set tcp listener\n", err.Error())
 		}
 	}()
+	go func() {
+		runHTTPServer(sys)
+	}()
 	sig := make(chan os.Signal)
 	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
 	for {
@@ -119,6 +124,24 @@ func main() {
 				log.Printf("[ERROR] Failed to reload configuration")
 			}
 		}
+	}
+}
+
+func runHTTPServer(sys *System) {
+	//	"github.com/gorilla/handlers"
+	servicePort := 3080
+	serviceIP := "0.0.0.0"
+	serviceAddress := fmt.Sprintf("%v:%v", serviceIP, servicePort)
+	log.Printf("Starting HTTP Service at: %v\n", serviceAddress)
+
+	r, err := NewHTTPApi(sys)
+	if err != nil {
+		log.Panicln(err)
+	}
+
+	err = http.ListenAndServe(serviceAddress, handlers.LoggingHandler(os.Stdout, r))
+	if err != nil {
+		log.Panicln(err)
 	}
 }
 

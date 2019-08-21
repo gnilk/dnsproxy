@@ -23,13 +23,25 @@
     ],
     "Hosts": [
         {
+            "Name":"Eriks-iPad",
+            "Rules": [
+                {
+                    "Type":"ActionTypePassAccumulatedTime",
+                    "MaxTime":"2:00"
+                },
+                {
+                    "Type":"ActionTypeBlockedDevice"
+                }
+            ]
+        },
+        {
             "Name": "127.0.0.1",
             "Rules": [
                 {
                     "Type": "ActionTypePass"
                 }
             ]
-	},
+	    },
         {
             "Name": "nagini",
             "Rules": [
@@ -53,7 +65,7 @@
     ],
     "Domains": [
         {
-            "Name": "*.rules.test",
+            "Name": "*.youtube.com",
             "Hosts": [
                 {
                     "Name": "127.0.0.2",

@@ -104,6 +104,15 @@ func (dc *DeviceCache) IPToName(ipaddr string) (string, error) {
 	return "", ErrDeviceIPNotFound
 }
 
+func (dc *DeviceCache) Devices() []RouterDevice {
+
+	arr := make([]RouterDevice, 0)
+	for _, v := range dc.devFromName {
+		arr = append(arr, v)
+	}
+	return arr
+}
+
 func (dc *DeviceCache) Dump() {
 	dc.lock.Lock()
 	defer dc.lock.Unlock()
