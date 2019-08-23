@@ -44,11 +44,11 @@ export default class BackendAPI {
     }
     static blockDevice(device) {
         console.log("BackendAPI::blockDevice")
-        return BackendAPI.callApiWithGET(config.SERVER_API_ROOT + "/device/"+device.Name+"/block")
+        return BackendAPI.callApiWithGET(config.SERVER_API_ROOT + "/devices/"+device.Host.Name+"/block")
     }
-    static releaseDevice(device) {
+    static unblockDevice(device) {
         console.log("BackendAPI::unblockDevice")
-        return BackendAPI.callApiWithGET(config.SERVER_API_ROOT + "/device/"+device.Name+"/release")
+        return BackendAPI.callApiWithGET(config.SERVER_API_ROOT + "/devices/"+device.Host.Name+"/release")
     }
 
 }
