@@ -1,10 +1,8 @@
 export const SERVER = 'http://127.0.0.1:3080';
-export const SERVER_API_ROOT = '/api/v1';
+export const SERVER_API_ROOT = '';
 
 
 
-export const INTRA_SERVER = SERVER;
-export const INTRA_API_ROOT = '/api/v1/intra';
 
 export const AUTH_SERVER = SERVER
 export const AUTH_API_ROOT = SERVER_API_ROOT;

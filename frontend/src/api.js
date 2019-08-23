@@ -16,7 +16,7 @@ export default class BackendAPI {
     static callApiWithGET(endpoint) {
         //let token = BackendAPI.getAuthToken();
 
-        console.log("BackendAPI::callApiWithGET"); //, token: ", token);
+        console.log("BackendAPI::callApiWithGET, endpoint: " + endpoint); //, token: ", token);
 
         return fetch(endpoint, {
             method: 'GET',
@@ -34,13 +34,21 @@ export default class BackendAPI {
         })
     }
     
-    static getGroup() {
-        console.log("BackendAPI::getGroup")
-        return BackendAPI.callApiWithGET(config.SERVER_API_ROOT + "/pouet/group/26")
+    static getDevices() {
+        console.log("BackendAPI::getDevices")
+        return BackendAPI.callApiWithGET(config.SERVER_API_ROOT + "/devices")
     }
-    static getProduct(prod) {
-        console.log("BackendAPI::getProd")
+    static getDeviceRules(device) {
+        console.log("BackendAPI::getDeviceRules")
         return BackendAPI.callApiWithGET(config.SERVER_API_ROOT + "/pouet/product/"+prod)
+    }
+    static blockDevice(device) {
+        console.log("BackendAPI::blockDevice")
+        return BackendAPI.callApiWithGET(config.SERVER_API_ROOT + "/device/"+device.Name+"/block")
+    }
+    static releaseDevice(device) {
+        console.log("BackendAPI::unblockDevice")
+        return BackendAPI.callApiWithGET(config.SERVER_API_ROOT + "/device/"+device.Name+"/release")
     }
 
 }

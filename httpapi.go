@@ -138,8 +138,30 @@ func getDevices(sys *System, w http.ResponseWriter, r *http.Request) (int, error
 	// return sendJSONResponse(w, user)
 
 	log.Printf("getDevices\n")
-	devices := sys.DeviceCache().Devices()
+	//devices := sys.DeviceCache().Devices()
+	devices := getDeviceData(sys)
 	return sendJSONResponse(w, devices)
+}
+
+type DeviceDTO struct {
+	Device RouterDevice
+	Host   Host
+}
+
+func getDeviceData(sys *System) []DeviceDTO {
+	dto := make([]DeviceDTO, 0)
+	devices := sys.DeviceCache().Devices()
+	for _, d := range devices {
+		h, _ := sys.RulesEngine().HostFromName(d.Name)
+		if h != nil {
+			data := DeviceDTO{
+				Device: d,
+				Host:   *h,
+			}
+			dto = append(dto, data)
+		}
+	}
+	return dto
 }
 
 func getDeviceRules(sys *System, w http.ResponseWriter, r *http.Request) (int, error) {

@@ -1,34 +1,7 @@
 <template>
     <div class="root_container">
         <div class="header">
-            <div class="toplogo">
-                <img src="toplogo.gif" />
-            </div>
-            <div class="tabs">
-                <span :class="[ subpage === 'news' ? 'tab is-active' : 'tab']">
-                    <a @click="subpage='news'">News</a>
-                </span>
-                <span :class="[ subpage === 'releases' ? 'tab is-active' : 'tab']">
-                    <a @click="subpage='releases'">Releases</a>
-                </span>                
-                <span :class="[ subpage === 'history' ? 'tab is-active' : 'tab']">
-                    <a @click="subpage='history'">History</a>
-                </span>                
-                <span :class="[ subpage === 'bla' ? 'tab is-active' : 'tab']">
-                    <a @click="onIntraClick()">Intranet</a>
-                </span>                
-            </div>
-        </div>
-        <div class="main_container">
-            <div v-if="subpage === 'news'">
-                THIS IS A NEWS PAGE
-            </div>
-            <div v-if="subpage === 'releases'">
-                <ReleaseList />
-            </div>
-            <div v-if="subpage === 'history'">
-                History
-            </div>
+            <DeviceList />
         </div>
     </div>
 </template>
@@ -64,14 +37,11 @@
     // import GalleryView from './Components/GalleryView.vue'
     // import ImageViewer from './Components/ImageViewer.vue'
 
-    import ReleaseList from './Components/ReleaseList.vue'
+    import DeviceList from './Components/DeviceList.vue'
 
     export default {
         components: {
-            // GalleryListing,
-            // GalleryView,
-            // ImageViewer,
-            ReleaseList
+            DeviceList
         },
    
         data: function() {
