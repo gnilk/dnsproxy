@@ -41,11 +41,28 @@ func (r *RulesEngine) Debugging(enable bool) {
 }
 
 //
+// Returns a reference to the host structure given a name
+//
+func (r *RulesEngine) HostFromName(host string) (*Host, error) {
+	for i, h := range r.conf.Hosts {
+		if r.HostMatch(host, h.Name) {
+			return &r.conf.Hosts[i], nil
+		}
+	}
+	return nil, ErrDeviceNameNotFound
+}
+
+//
 // Evaluate takes a domain and a host and evaluates if any rules apply
 //
 // For the DNS proxy the "domain" is the question and the host is the originator
 //
 func (r *RulesEngine) Evaluate(domain, host string) (ActionType, error) {
+
+	//
+	// TODO: split this in 'HostEvaluation' and 'DomainEvaluation'!!
+	//
+
 	action := r.conf.DefaultRule
 
 	if r.debug {
@@ -67,6 +84,13 @@ func (r *RulesEngine) Evaluate(domain, host string) (ActionType, error) {
 				}
 				return r.conf.OnErrorRule, err
 			}
+
+			// The rules returned 'ActionTypeNone' - let's check default..
+			if (action == ActionTypeNone) && (h.DefaultRule.Type != ActionTypeNone) {
+				// If the default is 'pass' we need to check the domains as well..
+				action, err = h.DefaultRule.EvaluateRule()
+			}
+
 			if r.debug {
 				log.Printf("  Result: %s\n", action.String())
 			}
@@ -75,6 +99,7 @@ func (r *RulesEngine) Evaluate(domain, host string) (ActionType, error) {
 			if action != ActionTypeNone {
 				return action, nil
 			}
+
 		}
 	}
 
@@ -145,6 +170,21 @@ func (re *RulesEngine) EvaluateRules(rules []Rule) (ActionType, error) {
 		}
 	}
 	return ActionTypeNone, nil
+}
+
+// Block will set the default rule to 'BlockedDevice' for the host
+func (h *Host) Block() {
+	h.DefaultRule.Type = ActionTypeBlockedDevice
+}
+
+// Unblock will set the default rule to 'Pass' for the host
+func (h *Host) Unblock() {
+	h.DefaultRule.Type = ActionTypePass
+}
+
+// PassThrough will set the default rule to 'None' for the host causing the rules engine to use the site wide default rule
+func (h *Host) PassThrough() {
+	h.DefaultRule.Type = ActionTypeNone
 }
 
 func (r *Rule) EvaluateRule() (ActionType, error) {

@@ -112,6 +112,14 @@ func (dc *DeviceCache) Devices() []RouterDevice {
 	}
 	return arr
 }
+func (dc *DeviceCache) DeviceFromName(name string) (RouterDevice, error) {
+	for _, v := range dc.devFromName {
+		if v.Name == name {
+			return v, nil
+		}
+	}
+	return RouterDevice{}, ErrDeviceNameNotFound
+}
 
 func (dc *DeviceCache) Dump() {
 	dc.lock.Lock()

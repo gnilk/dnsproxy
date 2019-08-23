@@ -34,6 +34,9 @@ func mapDomain(r *mux.Router, sys *System) {
 	r.Handle("/config", appHandler{sys, getConfig}).Methods("GET")
 	r.Handle("/config", appHandler{sys, postConfig}).Methods("POST")
 	r.Handle("/devices", appHandler{sys, getDevices}).Methods("GET")
+	r.Handle("/devices/{device}/rules", appHandler{sys, getDeviceRules}).Methods("GET")
+	r.Handle("/devices/{device}/block", appHandler{sys, getDeviceBlock}).Methods("GET")
+	r.Handle("/devices/{device}/release", appHandler{sys, getDeviceRelease}).Methods("GET")
 }
 
 func (ah appHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -122,6 +125,11 @@ func getConfig(sys *System, w http.ResponseWriter, r *http.Request) (int, error)
 	return http.StatusOK, nil
 }
 
+func postConfig(sys *System, w http.ResponseWriter, r *http.Request) (int, error) {
+	log.Printf("postConfig\n")
+	return http.StatusOK, nil
+}
+
 func getDevices(sys *System, w http.ResponseWriter, r *http.Request) (int, error) {
 	// user, err := checkAuthTokenAndGetUser(r)
 	// if err != nil {
@@ -134,9 +142,70 @@ func getDevices(sys *System, w http.ResponseWriter, r *http.Request) (int, error
 	return sendJSONResponse(w, devices)
 }
 
-func postConfig(sys *System, w http.ResponseWriter, r *http.Request) (int, error) {
-	log.Printf("postConfig\n")
-	return http.StatusOK, nil
+func getDeviceRules(sys *System, w http.ResponseWriter, r *http.Request) (int, error) {
+	vars := mux.Vars(r)
+	deviceName := vars["device"]
+	d, err := sys.DeviceCache().DeviceFromName(deviceName)
+	if err != nil {
+		log.Printf("Unable to find '%s' in device cache\n", deviceName)
+		return http.StatusInternalServerError, err
+	}
+
+	h, err := sys.RulesEngine().HostFromName(d.Name)
+	if err != nil {
+		// If no rule is found in the host section of the config - default rule applies
+		log.Printf("No specific host rules defined for '%s', using default!\n", d.Name)
+		return http.StatusInternalServerError, err
+	}
+	log.Printf("%+v\n", h)
+	return sendJSONResponse(w, h)
+}
+
+func getDeviceBlock(sys *System, w http.ResponseWriter, r *http.Request) (int, error) {
+	vars := mux.Vars(r)
+	deviceName := vars["device"]
+	d, err := sys.DeviceCache().DeviceFromName(deviceName)
+	if err != nil {
+		log.Printf("Unable to find '%s' in device cache\n", deviceName)
+		return http.StatusInternalServerError, err
+	}
+
+	h, err := sys.RulesEngine().HostFromName(d.Name)
+	if err != nil {
+		// If not specific host rule is found - we can't block!!
+		// TODO: Fix this - insert specific host rule!
+		log.Printf("No specific host rules defined for '%s', using can't block device!\n", d.Name)
+		return http.StatusInternalServerError, err
+	}
+
+	log.Printf("Blocking device '%s'\n", d.Name)
+	h.Block()
+
+	return sendJSONResponse(w, h)
+
+}
+
+func getDeviceRelease(sys *System, w http.ResponseWriter, r *http.Request) (int, error) {
+	vars := mux.Vars(r)
+	deviceName := vars["device"]
+	d, err := sys.DeviceCache().DeviceFromName(deviceName)
+	if err != nil {
+		log.Printf("Unable to find '%s' in device cache\n", deviceName)
+		return http.StatusInternalServerError, err
+	}
+
+	h, err := sys.RulesEngine().HostFromName(d.Name)
+	if err != nil {
+		// If not specific host rule is found - we can't block!!
+		// TODO: Fix this - insert specific host rule!
+		log.Printf("No specific host rules defined for '%s', using can't block device!\n", d.Name)
+		return http.StatusInternalServerError, err
+	}
+
+	log.Printf("Unblocking device '%s'\n", d.Name)
+	h.Unblock()
+
+	return sendJSONResponse(w, h)
 }
 
 //
