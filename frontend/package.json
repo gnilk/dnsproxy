@@ -1,5 +1,5 @@
 {
-  "name": "dnsproxy ui",
+  "name": "dnsproxy-frontend",
   "version": "1.0.0",
   "description": "front end for dnsproxy",
   "author": "Fredrik Kling",
