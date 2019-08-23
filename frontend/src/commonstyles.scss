@@ -1,0 +1,60 @@
+// Taken from Pouet.NET
+$noice_fg_color: white;
+$noice_fg_color_selected: black;
+$noice_fg_color_error: red;
+$noice_bg_color: #396BA5;
+$noice_bg_color_dark: #224488;
+
+
+body {
+	font-family: 'Open Sans', sans-serif;
+	height: 100vh;
+//	overflow: hidden;
+	background-color: $noice_bg_color;
+}
+
+.root_container {
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: 0;
+    padding-right: 0;
+    height: inherit;
+    display: flex;
+    flex-direction: column;
+    background-color: $noice_bg_color;
+    color: $noice_fg_color;
+}
+
+.app_container {
+    margin-left: 0;
+    margin-right: 0;   
+}
+
+.noice_default_container {
+    margin: 2px;
+    //border: 1px solid black;
+}
+.noice_release_container {
+    //margin: 4px;
+    border: 2px solid black;
+}
+
+
+.tabs {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin-top: 16px;
+}
+
+.tabs span.tab {
+    margin-left: 8px;
+    font-weight: normal;
+    cursor: pointer;        
+}
+.tabs span.is-active a {
+    border-bottom-color: #000000;
+    color: $noice_fg_color_selected;
+    border-bottom: 3px solid;
+    font-weight: bold;        
+}
