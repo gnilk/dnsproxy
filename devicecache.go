@@ -21,6 +21,7 @@ type DeviceCache struct {
 
 func NewDeviceCache(routerClient RouterClient, router Router) *DeviceCache {
 	dc := DeviceCache{
+		routerConfig: router,
 		routerClient: routerClient,
 		devFromName:  make(map[string]RouterDevice),
 		devFromIP:    make(map[string]RouterDevice),
@@ -34,17 +35,21 @@ func (dc *DeviceCache) Initialize() error {
 
 func (dc *DeviceCache) Refresh() error {
 	err := dc.doRefresh()
-	if err != nil {
-		err = dc.reInitialize()
-		if err != nil {
-			log.Printf("[ERROR] DeviceCache::Refresh, Unable to reinitialize router, err: %s\n", err.Error())
-		}
-	}
+
+	// This is not needed (should not be) as doRefresh will
+	// if err != nil {
+	// 	err = dc.reInitialize()
+	// 	if err != nil {
+	// 		log.Printf("[ERROR] DeviceCache::Refresh, Unable to reinitialize router, err: %s\n", err.Error())
+	// 	}
+	// }
 	return err
 }
 
 func (dc *DeviceCache) reInitialize() error {
+	log.Printf("DeviceCache::reInitialize, host: %s:%s\n", dc.routerConfig.Host, dc.routerConfig.Port)
 	return dc.routerClient.Login(dc.routerConfig.Host, dc.routerConfig.Port, dc.routerConfig.User, dc.routerConfig.Password)
+
 }
 
 func (dc *DeviceCache) doRefresh() error {
@@ -77,6 +82,7 @@ func (dc *DeviceCache) doRefresh() error {
 
 func (dc *DeviceCache) StartAutoRefresh(pollintervalsec int) {
 	go func() {
+		log.Printf("DeviceCache::StartAutoRefresh, auto refresh started\n")
 		for {
 			time.Sleep(time.Duration(pollintervalsec) * time.Second)
 			dc.Refresh()

@@ -10,13 +10,13 @@ import (
 )
 
 type UnifiRouterClient struct {
-	config     *Router
+	config     Router
 	controller *unifi.Unifi
 	//router *netgear.Client
 	//host, port, user, pass string
 }
 
-func NewUnifiRouterClient(config *Router) RouterClient {
+func NewUnifiRouterClient(config Router) RouterClient {
 	client := UnifiRouterClient{
 		config: config,
 	}
@@ -25,6 +25,7 @@ func NewUnifiRouterClient(config *Router) RouterClient {
 
 func (client *UnifiRouterClient) Login(host, port, user, pass string) error {
 	var err error
+	log.Printf("UnifiRouterClient::Login initated to: %s:%s\n", host, port)
 	client.controller, err = unifi.Login(user, pass, host, "8443", "dubious-machines.com", 5)
 	if err == nil {
 		// Save these, as we might need to re-login
@@ -37,6 +38,7 @@ func (client *UnifiRouterClient) Login(host, port, user, pass string) error {
 }
 
 func (client *UnifiRouterClient) AsyncLogin(host, port, user, pass string) error {
+	log.Printf("UnifiRouterClient::AsyncLogin, host: %s, port: %s\n", host, port)
 	ch := make(chan error, 1)
 	go func() {
 		err := client.Login(host, port, user, pass)
@@ -66,6 +68,7 @@ func (client *UnifiRouterClient) GetAttachedDeviceList() ([]RouterDevice, error)
 	if client.controller == nil {
 		log.Printf("[INFO] Unifi router disconnected, re-login initated\n")
 		//err := client.Login(client.host, client.port, client.user, client.pass)
+		log.Printf("UnifiRouterClient::GetAttachedDeviceList, client.config.host: %s\n", client.config.Host)
 		err := client.AsyncLogin(client.config.Host, client.config.Port, client.config.User, client.config.Password)
 		if err != nil {
 			return nil, err

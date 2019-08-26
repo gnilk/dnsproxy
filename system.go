@@ -54,20 +54,19 @@ func NewSystem(cfgFileName string) *System {
 		if err != nil {
 			log.Printf("[ERROR] Router initialization failed: %s\n", err.Error())
 			log.Printf("[WARN] Device Name lookup disabled - requires working router connection\n")
+		}
+		dc := NewDeviceCache(sys.routerClient, sys.config.Router)
+		err = dc.Initialize()
+		if err != nil {
+			log.Printf("[ERROR] Device Cache initialization failed: %s\n", err.Error())
 		} else {
-			dc := NewDeviceCache(sys.routerClient, sys.config.Router)
-			err = dc.Initialize()
-			if err != nil {
-				log.Printf("[ERROR] Device Cache initialization failed: %s\n", err.Error())
-			} else {
-				log.Printf("[INFO] Ok, device list downloaded")
-				sys.deviceCache = dc
-				dc.Dump()
-				if sys.Config().Router.PollChanges {
-					log.Printf("[INFO] Starting router auto refresh, interval: %d sec", sys.Config().Router.PollInterval)
-					dc.StartAutoRefresh(sys.Config().Router.PollInterval)
-				}
-			}
+			log.Printf("[INFO] Ok, device list downloaded")
+		}
+		sys.deviceCache = dc
+		dc.Dump()
+		if sys.Config().Router.PollChanges {
+			log.Printf("[INFO] Starting router auto refresh, interval: %d sec", sys.Config().Router.PollInterval)
+			dc.StartAutoRefresh(sys.Config().Router.PollInterval)
 		}
 	}
 
@@ -215,12 +214,14 @@ func (sys *System) initializeRouter(router Router) error {
 		routerClient = NewNetGearRouterClient()
 		break
 	case RouterTypeUnifi:
-		routerClient = NewUnifiRouterClient(&router)
+		routerClient = NewUnifiRouterClient(router)
 		break
 	default:
 		return fmt.Errorf("Unknown router type '%s', check configuration", router.Engine.String())
 	}
 
+	sys.routerClient = routerClient
+	log.Printf("System::intializeRouter, retrieving device list\n")
 	devices, err := routerClient.GetAttachedDeviceList()
 	if err != nil {
 		log.Printf("[ERR] Login failed\n")
@@ -230,8 +231,6 @@ func (sys *System) initializeRouter(router Router) error {
 	for _, d := range devices {
 		log.Printf("  %s - %s\n", d.IP, d.Name)
 	}
-
-	sys.routerClient = routerClient
 
 	return nil
 }
