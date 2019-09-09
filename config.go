@@ -524,6 +524,7 @@ func DomainFromXML(xmldata string) (*Domain, error) {
 //
 type Host struct {
 	Name        string
+	AltName     string
 	DefaultRule Rule
 	Rules       []Rule
 }
@@ -540,6 +541,14 @@ func (this *Host) GetName() string {
 
 func (this *Host) SetName(value string) {
 	this.Name = value
+}
+
+func (this *Host) GetAltName() string {
+	return this.AltName
+}
+
+func (this *Host) SetAltName(value string) {
+	this.AltName = value
 }
 
 func (this *Host) GetDefaultRule() Rule {

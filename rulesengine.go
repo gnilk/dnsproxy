@@ -73,7 +73,7 @@ func (r *RulesEngine) Evaluate(domain, host string) (ActionType, error) {
 	// of specific hosts but can also be used for generic rules like disabling DNS within a certain
 	// time-span
 	for _, h := range r.conf.Hosts {
-		if r.HostMatch(host, h.Name) {
+		if r.HostMatch(host, h.Name) || r.HostMatch(host, h.AltName) {
 			if r.debug {
 				log.Printf("Hostmatch, %s - %s, evaluting rules...\n", host, h.Name)
 			}

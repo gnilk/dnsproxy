@@ -51,6 +51,7 @@
 
     <define type="class" name="Host">
         <field type="string" name="Name" />
+        <field type="string" name="AltName" />
         <field type="Rule" name="DefaultRule" default="Rule { Type: ActionTypeNone }" />
         <field islist="true" type="Rule" name="Rules" />
     </define>
