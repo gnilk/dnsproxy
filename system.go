@@ -223,7 +223,7 @@ func (sys *System) initializeRouter(router Router) error {
 
 	devices, err := routerClient.GetAttachedDeviceList()
 	if err != nil {
-		log.Printf("[ERR] Login failed\n")
+		log.Printf("[ERROR] System::initializeRouter, failed to get attached device list, %s\n", err.Error())
 		return err
 	}
 	log.Printf("[OK] Router is working, devices:\n")

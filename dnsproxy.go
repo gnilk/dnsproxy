@@ -270,6 +270,13 @@ func dnsHandler(w dns.ResponseWriter, m *dns.Msg, proto string) {
 	// The device cache can be nil - if no router is configured (I should fix that)
 	if sys.DeviceCache() != nil {
 		clientName, err = sys.DeviceCache().IPToName(clientAddr)
+		if err != nil {
+			if clientAddr == "127.0.0.1" {
+				clientName = "localhost"
+			} else {
+				log.Printf("Error while translating IP (%s) to Name, error: %s\n", clientAddr, err.Error())
+			}
+		}
 	}
 
 	// Log this request

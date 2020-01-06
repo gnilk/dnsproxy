@@ -26,7 +26,8 @@ func NewUnifiRouterClient(config *Router) RouterClient {
 func (client *UnifiRouterClient) Login(host, port, user, pass string) error {
 	var err error
 	client.controller, err = unifi.Login(user, pass, host, "8443", "dubious-machines.com", 5)
-	if err == nil {
+	if err != nil {
+		log.Printf("[Error] Unifi login failed, err: %s\n", err.Error())
 		// Save these, as we might need to re-login
 		// client.host = host
 		// client.port = port
@@ -75,17 +76,20 @@ func (client *UnifiRouterClient) GetAttachedDeviceList() ([]RouterDevice, error)
 
 	site, err := client.controller.Site("dubious-machines.com")
 	if err != nil {
+		log.Printf("[ERROR] UnifiRouterClient, failed to fetch site from controller\n")
 		client.controller = nil
 		return nil, err
 	}
 	devices, err := client.controller.DeviceMap(site)
 	if err != nil {
+		log.Printf("[ERROR] UnifiRouterClient, failed to fetch devices from controller\n")
 		client.controller = nil
 		return nil, err
 	}
 
 	sta, err := client.controller.Sta(site)
 	if err != nil {
+		log.Printf("[ERROR] UnifiRouterClient, failed to fetch Sta from controller\n")
 		client.controller = nil
 		return nil, err
 	}

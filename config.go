@@ -118,6 +118,11 @@ type Config struct {
 	Domains          []Domain
 }
 
+func NewConfig() Config {
+	inst := Config{}
+	return inst
+}
+
 func (this *Config) GetLogfile() string {
 	return this.Logfile
 }
@@ -271,6 +276,12 @@ type Router struct {
 	TimeoutSec   int
 }
 
+func NewRouter() Router {
+	inst := Router{}
+	inst.TimeoutSec = 10
+	return inst
+}
+
 func (this *Router) GetHost() string {
 	return this.Host
 }
@@ -380,6 +391,11 @@ type NameServer struct {
 	IP string
 }
 
+func NewNameServer() NameServer {
+	inst := NameServer{}
+	return inst
+}
+
 func (this *NameServer) GetIP() string {
 	return this.IP
 }
@@ -432,6 +448,11 @@ func NameServerFromXML(xmldata string) (*NameServer, error) {
 type Domain struct {
 	Name  string
 	Hosts []Host
+}
+
+func NewDomain() Domain {
+	inst := Domain{}
+	return inst
 }
 
 func (this *Domain) GetName() string {
@@ -503,6 +524,11 @@ type Host struct {
 	Rules []Rule
 }
 
+func NewHost() Host {
+	inst := Host{}
+	return inst
+}
+
 func (this *Host) GetName() string {
 	return this.Name
 }
@@ -570,6 +596,11 @@ func HostFromXML(xmldata string) (*Host, error) {
 type Rule struct {
 	Type     ActionType
 	TimeSpan string
+}
+
+func NewRule() Rule {
+	inst := Rule{}
+	return inst
 }
 
 func (this *Rule) GetType() ActionType {
