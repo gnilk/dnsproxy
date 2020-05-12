@@ -211,6 +211,17 @@ func isBlockingAction(action ActionType) bool {
 	return false
 }
 
+func checkDnsServers(c *dns.Client, m *dns.Msg) (r *dns.Msg, err error) {
+
+	for _, ns := range sys.Config().NameServers {
+		r, _, err := c.Exchange(m, ns.IP)
+		if err == nil {
+			return r, nil
+		}
+	}
+	return nil, fmt.Errorf("hostname lookup faile")
+}
+
 func doDnsExchange(w dns.ResponseWriter, m *dns.Msg, proto string) {
 
 	m.Question[0].Name = strings.ToUpper(m.Question[0].Name)
@@ -219,11 +230,21 @@ func doDnsExchange(w dns.ResponseWriter, m *dns.Msg, proto string) {
 	c := new(dns.Client)
 	c.Net = proto
 	// TODO: Dig this out from Nameserver array
-	r, _, err := c.Exchange(m, "8.8.8.8:53")
+
+	r, err := checkDnsServers(c, m)
 	if err != nil {
 		fmt.Printf("[ERROR] Resolving '%s' while doing c.Exchange: %s\n", m.Question[0].Name, err.Error())
 		return
 	}
+
+	// for _, ns := range sys.Config().NameServers {
+
+	// 	r, _, err := c.Exchange(m, ns.IP)
+	// 	if err != nil {
+	// 		fmt.Printf("[ERROR] Resolving '%s' while doing c.Exchange: %s\n", m.Question[0].Name, err.Error())
+	// 		return
+	// 	}
+	// }
 
 	// {
 	// 	for i := 0; i < len(m.Question); i++ {
