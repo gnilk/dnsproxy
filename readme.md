@@ -4,6 +4,10 @@ Devices/IP (or names) can be blocked on a per device level or on a per domain ba
 Can talk to Netgear routers and Unifi Controllers to obtain device names which can be used by the block rules.
 A positive block can be redirected to specific IP number (defaults to 0.0.0.0).
 
+## New from 2020-05-12
+* Updated to work with current version of Dim13/unifi (see: github.com/dim13/unifi)
+* Finally forwarding to DNS servers as configured (was hardcoded)
+
 ## New from 2019-07-01
 * All rules can now have TimeSpan definitions
 * Possible to test configuration before deploying it (./dnsproxy -t)
