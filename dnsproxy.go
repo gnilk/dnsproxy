@@ -56,7 +56,7 @@ func main() {
 	testResolve := false;
 	testRules := false
 	cfgFile := "config.json"
-	testResolveName := "apakaka.local"
+	testResolveName := "fisken.office"
 
 	if len(os.Args) > 1 {
 		for i := 1; i < len(os.Args); i++ {
@@ -151,6 +151,7 @@ func doTestResolve(cfgFile string, name string) {
 		return
 	}
 	log.Printf("Config looks ok!\n")
+
 
 	ip, err := sys.Resolver().Resolve(name)
 	if err != nil {
