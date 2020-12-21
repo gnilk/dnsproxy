@@ -353,6 +353,7 @@ func dnsHandler(w dns.ResponseWriter, m *dns.Msg, proto string) {
 		if err == ErrHostNotFound {
 			doDnsExchange(w, m, proto)
 		} else {
+			log.Printf("Resolved to %s\n", ipaddr)
 			writeResolved(w,m, ipaddr, IPQuery)
 		}
 	}
