@@ -53,8 +53,10 @@ func printHelp() {
 }
 func main() {
 
+	testResolve := false;
 	testRules := false
 	cfgFile := "config.json"
+	testResolveName := "apakaka.local"
 
 	if len(os.Args) > 1 {
 		for i := 1; i < len(os.Args); i++ {
@@ -63,6 +65,9 @@ func main() {
 				switch arg[1] {
 				case 't':
 					testRules = true
+					break
+				case 'r' :
+					testResolve = true
 					break
 				default:
 					printHelp()
@@ -73,6 +78,11 @@ func main() {
 				cfgFile = arg
 			}
 		}
+	}
+
+	if testResolve {
+		doTestResolve(cfgFile, testResolveName);
+		os.Exit(1);
 	}
 
 	if testRules {
@@ -124,12 +134,31 @@ func main() {
 
 func doTestRules(cfgFile string) {
 	log.Printf("Testing rules, reading: %s\n", cfgFile)
-	err := TestSystemConfig(cfgFile)
+	_, err := TestSystemConfig(cfgFile)
 	if err != nil {
 		log.Printf("Failed, error: %s\n", err.Error())
 		return
 	}
 	log.Printf("Config looks ok!\n")
+	return
+}
+
+func doTestResolve(cfgFile string, name string) {
+	log.Printf("Testing Resolve with config: %s\n", cfgFile)
+	sys, err := TestSystemConfig(cfgFile)
+	if err != nil {
+		log.Printf("Failed, error: %s\n", err.Error())
+		return
+	}
+	log.Printf("Config looks ok!\n")
+
+	ip, err := sys.Resolver().Resolve(name)
+	if err != nil {
+		log.Printf("Error: %v\n", err)
+		return
+	}
+	log.Printf("Ok, resolved %s -> %s\n", name, ip)
+
 	return
 }
 
@@ -201,6 +230,41 @@ func writeBlockedRoute(w dns.ResponseWriter, message *dns.Msg, IPQuery int) {
 
 	w.WriteMsg(m)
 }
+
+func writeResolved(w dns.ResponseWriter, message *dns.Msg, addr string, IPQuery int) {
+	// Allow this to be configured
+	ipaddr := net.ParseIP(addr)
+
+	q := message.Question[0]
+
+	m := new(dns.Msg)
+	m.SetReply(message)
+
+	switch IPQuery {
+	case _IP4Query:
+		rrHeader := dns.RR_Header{
+			Name:   q.Name,
+			Rrtype: dns.TypeA,
+			Class:  dns.ClassINET,
+			Ttl:    10,
+		}
+		a := &dns.A{Hdr: rrHeader, A: ipaddr}
+		m.Answer = append(m.Answer, a)
+	case _IP6Query:
+		rrHeader := dns.RR_Header{
+			Name:   q.Name,
+			Rrtype: dns.TypeAAAA,
+			Class:  dns.ClassINET,
+			Ttl:    10,
+		}
+		a := &dns.AAAA{Hdr: rrHeader, AAAA: ipaddr}
+		m.Answer = append(m.Answer, a)
+	}
+
+	w.WriteMsg(m)
+}
+
+
 
 func isBlockingAction(action ActionType) bool {
 	if (action == ActionTypeBlockedDevice) ||
@@ -284,7 +348,13 @@ func dnsHandler(w dns.ResponseWriter, m *dns.Msg, proto string) {
 		// perhaps call 'dns.HandleFailed(w,m)' instead
 		writeBlockedRoute(w, m, IPQuery)
 	} else {
-		doDnsExchange(w, m, proto)
+		// Check if we resolve this to internal IP instead of external..
+		ipaddr, err := sys.Resolver().Resolve(domain)
+		if err == ErrHostNotFound {
+			doDnsExchange(w, m, proto)
+		} else {
+			writeResolved(w,m, ipaddr, IPQuery)
+		}
 	}
 
 	clientName := clientAddr

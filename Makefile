@@ -22,6 +22,7 @@ SRC_FILES = \
 	unifirouterclient.go \
 	devicecache.go \
 	system.go \
+	resolver.go \
 	util.go
 
 MODEL_SRC = config_datamodel.xml

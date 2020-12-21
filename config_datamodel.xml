@@ -25,6 +25,7 @@
         <field type="string" name="IPv4BlockResolve" />
         <field type="string" name="IPv6BlockResolve" />
         <field islist="true" type="Host" name="Hosts"/>
+        <field islist="true" type="Host" name="Resolve"/>
         <field islist="true" type="Domain" name="Domains"/>
     </define>
 
@@ -50,6 +51,7 @@
 
     <define type="class" name="Host">
         <field type="string" name="Name" />
+        <field type="string" name="IpV4" />
         <field islist="true" type="Rule" name="Rules" />
     </define>
 

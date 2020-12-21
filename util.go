@@ -2,6 +2,8 @@ package main
 
 import "strings"
 
+
+
 func StripPortFromAddr(addr string) string {
 	idxPortSeparator := strings.Index(addr, ":")
 	return addr[0:idxPortSeparator]

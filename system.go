@@ -13,6 +13,7 @@ type System struct {
 	performanceLog LogClient
 	config         *Config
 	rulesEngine    *RulesEngine
+	resolver       *Resolver
 	routerClient   RouterClient
 	deviceCache    *DeviceCache
 	mutex          sync.Mutex
@@ -74,6 +75,7 @@ func NewSystem(cfgFileName string) *System {
 	// Attach device cache to the rules engine
 	re.SetDeviceCache(sys.deviceCache)
 	sys.rulesEngine = re
+	sys.resolver = NewResolver(sys.config)
 
 	return &sys
 }
@@ -81,26 +83,26 @@ func NewSystem(cfgFileName string) *System {
 //
 // Tests the system configuration
 //
-func TestSystemConfig(cfgFileName string) error {
+func TestSystemConfig(cfgFileName string) (*System,error) {
 
 	sys := System{}
 	cfg, err := sys.loadConfig(cfgFileName)
 	if err != nil {
 		log.Panic(err)
-		return err
+		return nil, err
 	}
 	sys.config = cfg
 	err = sys.validateConfig(cfg)
 	if err != nil {
 		log.Panic(err)
-		return err
+		return nil, err
 	}
 
 	_, err = NewRulesEngine(sys.config)
 	if err != nil {
 		log.Println("[ERROR] failed create rules engine: ", err.Error())
 		//os.Exit(1)
-		return err
+		return nil, err
 	}
 
 	if sys.config.Router.Engine != RouterTypeNone {
@@ -109,10 +111,13 @@ func TestSystemConfig(cfgFileName string) error {
 		if err != nil {
 			log.Printf("[ERROR] Router initialization failed: %s\n", err.Error())
 			log.Printf("[WARN] Device Name lookup disabled - requires working router connection\n")
-			return err
+			return nil, err
 		}
 	}
-	return nil
+
+	sys.resolver = NewResolver(sys.config)
+
+	return &sys, nil
 }
 
 func (sys *System) ReloadConfig() error {
@@ -179,6 +184,10 @@ func (sys *System) RulesEngine() *RulesEngine {
 	sys.mutex.Lock()
 	defer sys.mutex.Unlock()
 	return sys.rulesEngine
+}
+
+func (sys *System) Resolver() *Resolver {
+	return sys.resolver
 }
 
 //

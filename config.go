@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
+	"strconv"
 )
 
 //
@@ -50,13 +51,22 @@ func (this ActionType) MarshalJSON() ([]byte, error) {
 func (this *ActionType) UnmarshalJSON(data []byte) error {
 	var s string
 	if err := json.Unmarshal(data, &s); err != nil {
-		return fmt.Errorf("ActionType should be a string")
+		numeric, err := strconv.Atoi(string(data))
+		if err != nil {
+			return fmt.Errorf("ActionType should be a string")
+		}
+		_, ok := mapActionTypeToName[ActionType(numeric)]
+		if !ok {
+			return fmt.Errorf("invalid ActionType in object")
+		}
+		*this = ActionType(numeric)
+	} else {
+		v, ok := mapActionTypeToValue[s]
+		if !ok {
+			return fmt.Errorf("invalid ActionType in object")
+		}
+		*this = v
 	}
-	v, ok := mapActionTypeToValue[s]
-	if !ok {
-		return fmt.Errorf("invalid ActionType")
-	}
-	*this = v
 	return nil
 }
 
@@ -92,13 +102,22 @@ func (this RouterType) MarshalJSON() ([]byte, error) {
 func (this *RouterType) UnmarshalJSON(data []byte) error {
 	var s string
 	if err := json.Unmarshal(data, &s); err != nil {
-		return fmt.Errorf("RouterType should be a string")
+		numeric, err := strconv.Atoi(string(data))
+		if err != nil {
+			return fmt.Errorf("RouterType should be a string")
+		}
+		_, ok := mapRouterTypeToName[RouterType(numeric)]
+		if !ok {
+			return fmt.Errorf("invalid RouterType in object")
+		}
+		*this = RouterType(numeric)
+	} else {
+		v, ok := mapRouterTypeToValue[s]
+		if !ok {
+			return fmt.Errorf("invalid RouterType in object")
+		}
+		*this = v
 	}
-	v, ok := mapRouterTypeToValue[s]
-	if !ok {
-		return fmt.Errorf("invalid RouterType")
-	}
-	*this = v
 	return nil
 }
 
@@ -115,12 +134,8 @@ type Config struct {
 	IPv4BlockResolve string
 	IPv6BlockResolve string
 	Hosts            []Host
+	Resolve          []Host
 	Domains          []Domain
-}
-
-func NewConfig() Config {
-	inst := Config{}
-	return inst
 }
 
 func (this *Config) GetLogfile() string {
@@ -209,6 +224,21 @@ func (this *Config) SetHosts(value []Host) {
 	copy(this.Hosts, value)
 }
 
+func (this *Config) GetResolveAsRef() []Host {
+	return this.Resolve[:len(this.Resolve)]
+}
+
+func (this *Config) GetResolveAsCopy() []Host {
+	newSlice := make([]Host, len(this.Resolve))
+	copy(newSlice, this.Resolve)
+	return newSlice
+}
+
+func (this *Config) SetResolve(value []Host) {
+	this.Resolve = make([]Host, len(value))
+	copy(this.Resolve, value)
+}
+
 func (this *Config) GetDomainsAsRef() []Domain {
 	return this.Domains[:len(this.Domains)]
 }
@@ -274,12 +304,6 @@ type Router struct {
 	PollChanges  bool
 	PollInterval int
 	TimeoutSec   int
-}
-
-func NewRouter() Router {
-	inst := Router{}
-	inst.TimeoutSec = 10
-	return inst
 }
 
 func (this *Router) GetHost() string {
@@ -391,11 +415,6 @@ type NameServer struct {
 	IP string
 }
 
-func NewNameServer() NameServer {
-	inst := NameServer{}
-	return inst
-}
-
 func (this *NameServer) GetIP() string {
 	return this.IP
 }
@@ -448,11 +467,6 @@ func NameServerFromXML(xmldata string) (*NameServer, error) {
 type Domain struct {
 	Name  string
 	Hosts []Host
-}
-
-func NewDomain() Domain {
-	inst := Domain{}
-	return inst
 }
 
 func (this *Domain) GetName() string {
@@ -521,12 +535,8 @@ func DomainFromXML(xmldata string) (*Domain, error) {
 //
 type Host struct {
 	Name  string
+	IpV4  string
 	Rules []Rule
-}
-
-func NewHost() Host {
-	inst := Host{}
-	return inst
 }
 
 func (this *Host) GetName() string {
@@ -535,6 +545,14 @@ func (this *Host) GetName() string {
 
 func (this *Host) SetName(value string) {
 	this.Name = value
+}
+
+func (this *Host) GetIpV4() string {
+	return this.IpV4
+}
+
+func (this *Host) SetIpV4(value string) {
+	this.IpV4 = value
 }
 
 func (this *Host) GetRulesAsRef() []Rule {
@@ -596,11 +614,6 @@ func HostFromXML(xmldata string) (*Host, error) {
 type Rule struct {
 	Type     ActionType
 	TimeSpan string
-}
-
-func NewRule() Rule {
-	inst := Rule{}
-	return inst
 }
 
 func (this *Rule) GetType() ActionType {
