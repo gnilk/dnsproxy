@@ -25,6 +25,7 @@ func NewResolver(conf *Config) (*Resolver) {
 
 func (r *Resolver) Resolve(domain string) (string, error) {
 	for _,r := range r.conf.Resolve {
+		log.Printf("testing: %s", r.Name)
 		if WildcardPatternMatch(strings.ToLower(domain), strings.ToLower(r.Name)) {
 			return r.IpV4, nil
 		}
