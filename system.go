@@ -83,7 +83,7 @@ func NewSystem(cfgFileName string) *System {
 //
 // Tests the system configuration
 //
-func TestSystemConfig(cfgFileName string) (*System,error) {
+func TestSystemConfig(cfgFileName string) (*System, error) {
 
 	sys := System{}
 	cfg, err := sys.loadConfig(cfgFileName)
@@ -221,7 +221,7 @@ func (sys *System) initializeRouter(router Router) error {
 	var routerClient RouterClient
 	switch router.Engine {
 	case RouterTypeNetGear:
-		routerClient = NewNetGearRouterClient()
+		routerClient = NewNetGearRouterClient(&router)
 		break
 	case RouterTypeUnifi:
 		routerClient = NewUnifiRouterClient(&router)

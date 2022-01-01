@@ -5,11 +5,15 @@ import (
 )
 
 type NetGearRouterClient struct {
+	config *Router
 	router *netgear.Client
 }
 
-func NewNetGearRouterClient() RouterClient {
-	client := NetGearRouterClient{}
+func NewNetGearRouterClient(config *Router) RouterClient {
+	client := NetGearRouterClient{
+		config: config,
+	}
+	client.Login(config.Host, config.Port, config.User, config.Password)
 	return &client
 }
 
