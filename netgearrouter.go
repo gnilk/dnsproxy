@@ -1,6 +1,9 @@
 package main
 
-import "netgear-go"
+import (
+	"netgear-go"
+	"strings"
+)
 
 type NetGearRouterClient struct {
 	config *Router
@@ -39,7 +42,7 @@ func (client *NetGearRouterClient) transformDevices(devices []netgear.AttachedDe
 
 		rd := RouterDevice{
 			IP:       d.IP,
-			Name:     d.Name,
+			Name:     strings.ToLower(d.Name),
 			MAC:      d.MAC,
 			Type:     d.Type,
 			LinkRate: d.LinkRate,

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log"
 	"net"
+	"strings"
 	"sync"
 	"time"
 )
@@ -48,14 +49,16 @@ func (dc *DeviceCache) reInitialize() error {
 }
 
 func (dc *DeviceCache) doRefresh() error {
-	dc.lock.Lock()
-	defer dc.lock.Unlock()
 
 	devices, err := dc.routerClient.GetAttachedDeviceList()
 	if err != nil {
 		log.Printf("[ERROR] DeviceCache::Refresh, failed to retrieve list of attached devices: %s\n", err.Error())
 		return err
 	}
+
+	dc.lock.Lock()
+	defer dc.lock.Unlock()
+
 	// set to table
 	for _, d := range devices {
 		// TODO: A device can have multiple IP's this will just go into a toggle!!!!
@@ -88,7 +91,7 @@ func (dc *DeviceCache) NameToIP(name string) (net.IP, error) {
 	dc.lock.Lock()
 	defer dc.lock.Unlock()
 
-	if d, ok := dc.devFromName[name]; ok {
+	if d, ok := dc.devFromName[strings.ToLower(name)]; ok {
 		return d.IP, nil
 	}
 	return nil, ErrDeviceNameNotFound

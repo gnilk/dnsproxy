@@ -56,7 +56,7 @@ func main() {
 	testResolve := false
 	testRules := false
 	cfgFile := "config.json"
-	testResolveName := "MIKAELS-MBP"
+	testResolveName := "mikaels-MBP"
 
 	if len(os.Args) > 1 {
 		for i := 1; i < len(os.Args); i++ {

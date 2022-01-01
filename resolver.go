@@ -33,6 +33,8 @@ func (r *Resolver) Resolve(domain string) (string, error) {
 		}
 	}
 
+	log.Printf("Resolve with device cache")
+	domain = strings.TrimSuffix(domain, ".")
 	ip, err := r.sys.DeviceCache().NameToIP(domain)
 	if err != nil {
 		log.Printf("Name %s not found\n", domain)
