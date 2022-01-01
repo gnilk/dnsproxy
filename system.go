@@ -75,7 +75,7 @@ func NewSystem(cfgFileName string) *System {
 	// Attach device cache to the rules engine
 	re.SetDeviceCache(sys.deviceCache)
 	sys.rulesEngine = re
-	sys.resolver = NewResolver(sys.config)
+	sys.resolver = NewResolver(&sys)
 
 	return &sys
 }
@@ -113,9 +113,19 @@ func TestSystemConfig(cfgFileName string) (*System, error) {
 			log.Printf("[WARN] Device Name lookup disabled - requires working router connection\n")
 			return nil, err
 		}
+
+		dc := NewDeviceCache(sys.routerClient, sys.config.Router)
+		err = dc.Initialize()
+		if err != nil {
+			log.Printf("[ERROR] Device Cache initialization failed: %s\n", err.Error())
+		} else {
+			log.Printf("[INFO] Ok, device list downloaded")
+			sys.deviceCache = dc
+			dc.Dump()
+		}
 	}
 
-	sys.resolver = NewResolver(sys.config)
+	sys.resolver = NewResolver(&sys)
 
 	return &sys, nil
 }

@@ -1,8 +1,6 @@
 package main
 
-import (
-	netgear "github.com/EvanPurkhiser/netgear-go"
-)
+import "netgear-go"
 
 type NetGearRouterClient struct {
 	config *Router

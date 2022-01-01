@@ -53,10 +53,10 @@ func printHelp() {
 }
 func main() {
 
-	testResolve := false;
+	testResolve := false
 	testRules := false
 	cfgFile := "config.json"
-	testResolveName := "fisken.office."
+	testResolveName := "MIKAELS-MBP"
 
 	if len(os.Args) > 1 {
 		for i := 1; i < len(os.Args); i++ {
@@ -66,7 +66,7 @@ func main() {
 				case 't':
 					testRules = true
 					break
-				case 'r' :
+				case 'r':
 					testResolve = true
 					break
 				default:
@@ -81,8 +81,8 @@ func main() {
 	}
 
 	if testResolve {
-		doTestResolve(cfgFile, testResolveName);
-		os.Exit(1);
+		doTestResolve(cfgFile, testResolveName)
+		os.Exit(1)
 	}
 
 	if testRules {
@@ -151,7 +151,6 @@ func doTestResolve(cfgFile string, name string) {
 		return
 	}
 	log.Printf("Config looks ok!\n")
-
 
 	log.Printf("Resolving: %s\n", name)
 	ip, err := sys.Resolver().Resolve(name)
@@ -266,8 +265,6 @@ func writeResolved(w dns.ResponseWriter, message *dns.Msg, addr string, IPQuery 
 	w.WriteMsg(m)
 }
 
-
-
 func isBlockingAction(action ActionType) bool {
 	if (action == ActionTypeBlockedDevice) ||
 		(action == ActionTypeBlockedSiteBan) ||
@@ -357,7 +354,7 @@ func dnsHandler(w dns.ResponseWriter, m *dns.Msg, proto string) {
 			doDnsExchange(w, m, proto)
 		} else {
 			log.Printf("Resolved to %s\n", ipaddr)
-			writeResolved(w,m, ipaddr, IPQuery)
+			writeResolved(w, m, ipaddr, IPQuery)
 		}
 	}
 
