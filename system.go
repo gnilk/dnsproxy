@@ -19,9 +19,7 @@ type System struct {
 	mutex          sync.Mutex
 }
 
-//
 // NewSystem creates a new system object and initializes the sub systems
-//
 func NewSystem(cfgFileName string) *System {
 
 	sys := System{}
@@ -80,9 +78,7 @@ func NewSystem(cfgFileName string) *System {
 	return &sys
 }
 
-//
 // Tests the system configuration
-//
 func TestSystemConfig(cfgFileName string) (*System, error) {
 
 	sys := System{}
@@ -178,18 +174,14 @@ func (sys *System) ReloadConfig() error {
 	return nil
 }
 
-//
 // Config return internal config object
-//
 func (sys *System) Config() *Config {
 	sys.mutex.Lock()
 	defer sys.mutex.Unlock()
 	return sys.config
 }
 
-//
 // RulesEngine return internal RulesEngine object
-//
 func (sys *System) RulesEngine() *RulesEngine {
 	sys.mutex.Lock()
 	defer sys.mutex.Unlock()
@@ -200,18 +192,14 @@ func (sys *System) Resolver() *Resolver {
 	return sys.resolver
 }
 
-//
 // RouterClient returns the internal/global RouterClient object
-//
 func (sys *System) RouterClient() RouterClient {
 	sys.mutex.Lock()
 	defer sys.mutex.Unlock()
 	return sys.routerClient
 }
 
-//
 // DeviceCache returns the internal/global DeviceCache object
-//
 func (sys *System) DeviceCache() *DeviceCache {
 	sys.mutex.Lock()
 	defer sys.mutex.Unlock()
@@ -224,15 +212,13 @@ func (sys *System) PerfLog() LogClient {
 	return sys.performanceLog
 }
 
-//
 // Support functions to get all subsystems up and running
-//
 func (sys *System) initializeRouter(router Router) error {
 	var routerClient RouterClient
 	switch router.Engine {
-	case RouterTypeNetGear:
-		routerClient = NewNetGearRouterClient(&router)
-		break
+	//case RouterTypeNetGear:
+	//	routerClient = NewNetGearRouterClient(&router)
+	//	break
 	case RouterTypeUnifi:
 		routerClient = NewUnifiRouterClient(&router)
 		break

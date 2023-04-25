@@ -1,13 +1,14 @@
+// deprecated!
 package main
 
 import (
-	"netgear-go"
+	netgear "github.com/DRuggeri/netgear_client"
 	"strings"
 )
 
 type NetGearRouterClient struct {
 	config *Router
-	router *netgear.Client
+	router *netgear.NetgearClient
 }
 
 func NewNetGearRouterClient(config *Router) RouterClient {
@@ -19,11 +20,11 @@ func NewNetGearRouterClient(config *Router) RouterClient {
 }
 
 func (client *NetGearRouterClient) Login(host, port, user, pass string) error {
-	client.router = netgear.NewClient(host, user, pass)
-	return client.router.Login()
+	client.router, _ = netgear.NewNetgearClient(host, true, user, pass)
+	return client.router.LogIn()
 }
 func (client *NetGearRouterClient) GetAttachedDeviceList() ([]RouterDevice, error) {
-	devices, err := client.router.Devices()
+	devices, err := client.router.G
 	if err != nil {
 		return nil, err
 	}
