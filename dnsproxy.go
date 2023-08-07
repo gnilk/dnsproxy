@@ -352,7 +352,7 @@ func dnsHandler(w dns.ResponseWriter, m *dns.Msg, proto string) {
 		// Check if we resolve this to internal IP instead of external..
 		ipaddr, err := sys.Resolver().Resolve(domain)
 		if err == ErrHostNotFound {
-			log.Printf("Unable to resolve '%s', forwarding to external\n", domain)
+			log.Printf("Unable to resolve '%s' for '%s', forwarding to external\n", domain, clientAddr)
 			doDnsExchange(w, m, proto)
 		} else {
 			log.Printf("Resolved to %s\n", ipaddr)
