@@ -18,7 +18,6 @@ SRC_FILES = \
 	config.go \
 	rulesengine.go \
 	routerclient.go \
-	netgearrouter.go \
 	unifirouterclient.go \
 	devicecache.go \
 	system.go \

@@ -1,24 +1,30 @@
+// deprecated!
 package main
 
 import (
-	netgear "github.com/EvanPurkhiser/netgear-go"
+	netgear "github.com/DRuggeri/netgear_client"
+	"strings"
 )
 
 type NetGearRouterClient struct {
-	router *netgear.Client
+	config *Router
+	router *netgear.NetgearClient
 }
 
-func NewNetGearRouterClient() RouterClient {
-	client := NetGearRouterClient{}
+func NewNetGearRouterClient(config *Router) RouterClient {
+	client := NetGearRouterClient{
+		config: config,
+	}
+	client.Login(config.Host, config.Port, config.User, config.Password)
 	return &client
 }
 
 func (client *NetGearRouterClient) Login(host, port, user, pass string) error {
-	client.router = netgear.NewClient(host, user, pass)
-	return client.router.Login()
+	client.router, _ = netgear.NewNetgearClient(host, true, user, pass)
+	return client.router.LogIn()
 }
 func (client *NetGearRouterClient) GetAttachedDeviceList() ([]RouterDevice, error) {
-	devices, err := client.router.Devices()
+	devices, err := client.router.G
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +43,7 @@ func (client *NetGearRouterClient) transformDevices(devices []netgear.AttachedDe
 
 		rd := RouterDevice{
 			IP:       d.IP,
-			Name:     d.Name,
+			Name:     strings.ToLower(d.Name),
 			MAC:      d.MAC,
 			Type:     d.Type,
 			LinkRate: d.LinkRate,

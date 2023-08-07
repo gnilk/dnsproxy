@@ -19,9 +19,7 @@ type System struct {
 	mutex          sync.Mutex
 }
 
-//
 // NewSystem creates a new system object and initializes the sub systems
-//
 func NewSystem(cfgFileName string) *System {
 
 	sys := System{}
@@ -75,15 +73,13 @@ func NewSystem(cfgFileName string) *System {
 	// Attach device cache to the rules engine
 	re.SetDeviceCache(sys.deviceCache)
 	sys.rulesEngine = re
-	sys.resolver = NewResolver(sys.config)
+	sys.resolver = NewResolver(&sys)
 
 	return &sys
 }
 
-//
 // Tests the system configuration
-//
-func TestSystemConfig(cfgFileName string) (*System,error) {
+func TestSystemConfig(cfgFileName string) (*System, error) {
 
 	sys := System{}
 	cfg, err := sys.loadConfig(cfgFileName)
@@ -113,9 +109,19 @@ func TestSystemConfig(cfgFileName string) (*System,error) {
 			log.Printf("[WARN] Device Name lookup disabled - requires working router connection\n")
 			return nil, err
 		}
+
+		dc := NewDeviceCache(sys.routerClient, sys.config.Router)
+		err = dc.Initialize()
+		if err != nil {
+			log.Printf("[ERROR] Device Cache initialization failed: %s\n", err.Error())
+		} else {
+			log.Printf("[INFO] Ok, device list downloaded")
+			sys.deviceCache = dc
+			dc.Dump()
+		}
 	}
 
-	sys.resolver = NewResolver(sys.config)
+	sys.resolver = NewResolver(&sys)
 
 	return &sys, nil
 }
@@ -168,18 +174,14 @@ func (sys *System) ReloadConfig() error {
 	return nil
 }
 
-//
 // Config return internal config object
-//
 func (sys *System) Config() *Config {
 	sys.mutex.Lock()
 	defer sys.mutex.Unlock()
 	return sys.config
 }
 
-//
 // RulesEngine return internal RulesEngine object
-//
 func (sys *System) RulesEngine() *RulesEngine {
 	sys.mutex.Lock()
 	defer sys.mutex.Unlock()
@@ -190,18 +192,14 @@ func (sys *System) Resolver() *Resolver {
 	return sys.resolver
 }
 
-//
 // RouterClient returns the internal/global RouterClient object
-//
 func (sys *System) RouterClient() RouterClient {
 	sys.mutex.Lock()
 	defer sys.mutex.Unlock()
 	return sys.routerClient
 }
 
-//
 // DeviceCache returns the internal/global DeviceCache object
-//
 func (sys *System) DeviceCache() *DeviceCache {
 	sys.mutex.Lock()
 	defer sys.mutex.Unlock()
@@ -214,15 +212,13 @@ func (sys *System) PerfLog() LogClient {
 	return sys.performanceLog
 }
 
-//
 // Support functions to get all subsystems up and running
-//
 func (sys *System) initializeRouter(router Router) error {
 	var routerClient RouterClient
 	switch router.Engine {
-	case RouterTypeNetGear:
-		routerClient = NewNetGearRouterClient()
-		break
+	//case RouterTypeNetGear:
+	//	routerClient = NewNetGearRouterClient(&router)
+	//	break
 	case RouterTypeUnifi:
 		routerClient = NewUnifiRouterClient(&router)
 		break
